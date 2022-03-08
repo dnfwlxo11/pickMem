@@ -1,0 +1,47 @@
+<template>
+    <div class="pick-mem">
+        <div class="container mt-5 mb-5">
+            <div class="layout m-auto">
+                <div>
+                    <step-one v-if="step==0" @on-next="nextStep" @on-previous="previousStep"></step-one>
+                    <step-two v-else-if="step==1" @on-next="nextStep" @on-previous="previousStep"></step-two>
+                    <step-three v-else-if="step==2" @on-next="nextStep" @on-previous="previousStep"></step-three>
+                </div>
+            </div>
+        </div>
+    </div>    
+</template>
+
+<script>
+import stepOne from '../steps/stepOne.vue';
+import stepTwo from '../steps/stepTwo.vue';
+import stepThree from '../steps/stepThree.vue';
+
+export default {
+    name: 'PickMem',
+    components: {
+        stepOne,
+        stepTwo,
+        stepThree,
+    },
+    data() {
+        return {
+            step: 0,
+        }
+    },
+    methods: {
+        nextStep() {
+            if (this.step == 2) return;
+            this.step += 1;
+        },
+
+        previousStep() {
+            if (this.step == 0) return;
+            this.step -= 1;
+        },
+    },
+}
+</script>
+
+<style scoped>
+</style>

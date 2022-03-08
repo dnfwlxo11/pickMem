@@ -1,21 +1,31 @@
 <template>
   <div class="home">
     <div class="container mt-5 mb-5">
-      <div class="text-center mb-3">
-        <span>1 2 3 4 5</span>
+      <div class="layout m-auto">
+        <div>
+          <main-page></main-page>
+        </div>
       </div>
-      <three></three>
     </div>
   </div>
 </template>
 
 <script>
-import three from './steps/stepThree.vue'
+import mainPage from './vues/mainPage.vue'
 
 export default {
   name: 'Home',
   components: {
-    three,
-  }
+    mainPage
+  },
 }
 </script>
+
+<style>
+.layout {
+  padding: 30px;
+  width: 800px;
+  height: 800px;
+  box-shadow: 0.5px 0.5px 1.5px black;
+}
+</style>

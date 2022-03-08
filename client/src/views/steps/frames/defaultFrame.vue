@@ -1,7 +1,7 @@
 <template>
     <div class="default-frame">
         <div>
-            <div class="outter-frame mb-3">
+            <div class="outter-frame mt-3 mb-3">
                 <div class="inner-frame d-flex justify-content-center align-items-center mb-4" ref="booth">
                     <div v-show="!isLoading" class="booth">
                         <video v-show="!isPhotoTaken" ref="camera" class="canvas" :height="boothHeight" :width="boothWidth" autoplay></video>
@@ -14,9 +14,6 @@
                         <canvas v-show="isPhotoTaken" id="photo-2" class="canvas" :height="boothHeight" :width="boothWidth" ref="canvas-2"></canvas>
                     </div>
                 </div>
-            </div>
-            <div class="takePic d-flex justify-content-center align-items-center ml-auto mr-auto">
-                <i class="mdi mdi-camera-outline" style="font-size: 30px;" @click="takePhoto"></i>
             </div>
         </div>
     </div>
@@ -40,7 +37,7 @@ export default {
     },
     mounted() {
         this.calcBoothSize();
-        this.createCameraElement();
+        // this.createCameraElement();
     },
     methods: {
         calcBoothSize() {
