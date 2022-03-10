@@ -6,7 +6,10 @@
         </div>
         <div class="row mb-3">
             <div class="col-8 frame d-flex justify-content-center">
-                <default-frame></default-frame>
+                <!-- <default-frame></default-frame> -->
+                <!-- <onefour-frame></onefour-frame> -->
+                <onethree-frame></onethree-frame>
+
             </div>
             <div class="col-4">
                 이미지 리스트
@@ -28,11 +31,15 @@
 <script>
 import draggable from "vuedraggable";
 import defaultFrame from './frames/defaultFrame.vue'
+import onethreeFrame from './frames/onethreeFrame.vue'
+import onefourFrame from './frames/onefourFrame.vue'
 
 export default {
     name: 'StepThree',
     components: {
         defaultFrame,
+        onethreeFrame,
+        onefourFrame,
         draggable,
     },
     data() {
@@ -49,15 +56,14 @@ export default {
         selectToClick(src) {
             this.selectTarget = this.$store.getters.getTargets;
 
-            if (Object.keys(this.selectTarget).length > 1) {
+            if (Object.keys(this.selectTarget).length > 3) {
                 console.log('이미 모두 골랐어요.')
                 return;
             } else {
                 if (this.$store.getters.getRemoveQueueCnt) {
                     let removeQueue = this.$store.getters.getRemoveQueues;
-                    console.log(removeQueue, 'before');
                     let recoverKey = removeQueue.shift();
-                    console.log(removeQueue, 'after');
+
                     this.$store.commit('setUpdateQueue', removeQueue)
                     this.$store.commit('setTarget', [recoverKey, src])
                 }

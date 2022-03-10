@@ -6,7 +6,29 @@
                 <hr>
             </div>
             <div class="frame-list mb-3" style="overflow-y: auto;">
-
+                <div class="w-25">
+                    2 Cuts
+                    <hr>
+                    <div class="row">
+                        <div class="col-6">
+                            <default-frame></default-frame>
+                        </div>
+                        <!-- <div class="col-6">
+                            <onethree-frame></onethree-frame>
+                        </div> -->
+                        <!-- <div class="col-3">
+                            <onefour-frame></onefour-frame>
+                        </div> -->
+                    </div>
+                    3 Cuts
+                    <hr>
+                    4 Cuts
+                    <hr>
+                    6 Cuts
+                    <hr>
+                </div>
+                
+                
             </div>
             <div class="text-center">
                 <button class="btn btn-outline-primary mr-3" @click="$router.push('/')">처 음 으 로</button>
@@ -17,10 +39,16 @@
 </template>
 
 <script>
+import defaultFrame from './frames/defaultFrame.vue'
+import onethreeFrame from './frames/onethreeFrame.vue'
+import onefourFrame from './frames/onefourFrame.vue'
 
 export default {
     name: 'StepOne',
-    components: {   
+    components: {
+        defaultFrame,
+        onethreeFrame,
+        onefourFrame
     },
     methods: {
     }

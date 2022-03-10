@@ -1,7 +1,7 @@
 <template>
     <div class="onefour-frame">
         <div class="outter-frame mt-3 mb-3">
-            <div class="inner-frame d-flex justify-content-center align-items-center mb-4" v-for="(item, idx) of [1, 2, 3, 4]" :key="idx">
+            <div class="inner-frame d-flex justify-content-center align-items-center mb-4" v-for="(item, idx) of [1, 2, 3]" :key="idx">
                 <div class="booth" @drop="drop" @dragover.prevent>
                     <div v-if="!images[item]" class="image">
                         <canvas class="inner-image" :id="`canvas-${item}`" ></canvas>
@@ -53,22 +53,22 @@ export default {
 <style scoped>
 .outter-frame {
     padding: 20px;
-    height: 570px;
-    width: 210px;
+    height: 590px;
+    width: 290px;
     box-shadow: 0.5px 0.5px 1.5px black;
 }
 
 .inner-image {
-    height: 100px;
-    width: 170px;
+    height: 150px;
+    width: 240px;
     box-shadow: 0.5px 0.5px 1.5px black;
 }
 
 .overlay {
     position: absolute;
     font-size: 30px;
-    top: -10%;
-    left: 85%;
+    top: -6%;
+    left: 88%;
 }
 
 .booth {
