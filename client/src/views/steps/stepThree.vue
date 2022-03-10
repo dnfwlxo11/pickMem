@@ -12,11 +12,9 @@
                 이미지 리스트
                 <hr>
                 <div style="height: 550px;overflow-y: auto;">
-                    <div v-if="images.length">
-                        <div v-for="(item, idx) of images" :key="idx">
-                            <img class="previewImg" :src="item" alt="">
-                            <hr>
-                        </div>
+                    <div v-for="(value, id) in images" :key="id" @dragstart="dragStart" @dragleave.prevent @drop.prevent>
+                        <img class="previewImg" :src="value" alt="" :id="`${id}`" @click="selectToClick(value)">
+                        <hr>
                     </div>
                 </div>
             </div>
@@ -28,25 +26,50 @@
 </template>
 
 <script>
+import draggable from "vuedraggable";
 import defaultFrame from './frames/defaultFrame.vue'
 
 export default {
     name: 'StepThree',
     components: {
         defaultFrame,
+        draggable,
     },
     data() {
         return {
-            images: []
+            images: {},
+            selectTarget: {},
         }
     },
     mounted() {
         this.images = this.$store.getters.getImages;
-        console.log(this.$store.getters.getImages, 'getter')
-        console.log(this.images, 'images')
+        this.selectTarget = this.$store.getters.getTargets;
     },
     methods: {
+        selectToClick(src) {
+            this.selectTarget = this.$store.getters.getTargets;
 
+            if (Object.keys(this.selectTarget).length > 1) {
+                console.log('이미 모두 골랐어요.')
+                return;
+            } else {
+                if (this.$store.getters.getRemoveQueueCnt) {
+                    let removeQueue = this.$store.getters.getRemoveQueues;
+                    console.log(removeQueue, 'before');
+                    let recoverKey = removeQueue.shift();
+                    console.log(removeQueue, 'after');
+                    this.$store.commit('setUpdateQueue', removeQueue)
+                    this.$store.commit('setTarget', [recoverKey, src])
+                }
+                else {
+                    this.$store.commit('setTarget', [Object.keys(this.selectTarget).length + 1, src]);
+                }
+                this.selectTarget = this.$store.getters.getTargets;
+            }
+        },
+        dragStart(e) {
+            e.dataTransfer.setData("text/plain", e.target.src)
+        },
     },
 }
 </script>

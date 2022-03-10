@@ -32,6 +32,7 @@ export default {
     methods: {
         nextStep() {
             if (this.step == 2) return;
+            if (this.step == 1 && Object.keys(this.$store.getters.getImages).length < 6) return; 
             this.step += 1;
         },
 

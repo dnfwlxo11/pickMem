@@ -17,9 +17,9 @@
                     </div>
                 </div>
                 <div class="text-right">
-                    ( {{images.length}} / 6 )
+                    ( {{Object.keys(images).length}} / 6 )
                 </div>
-                <div v-if="images.length < 6" class="takePic d-flex justify-content-center align-items-center ml-auto mr-auto">
+                <div v-if="Object.keys(images).length < 6" class="takePic d-flex justify-content-center align-items-center ml-auto mr-auto">
                     <i class="mdi mdi-camera-outline" style="font-size: 30px;" @click="takePhoto"></i>
                 </div>
                 <div v-else class="text-center">
@@ -45,7 +45,7 @@ export default {
     },
     data() {
         return {
-            images: [],
+            images: {},
             boothWidth: null,
             boothHeight: null,
             isCameraOpen: false,
@@ -120,17 +120,22 @@ export default {
 
         saveImage() {
             const image = this.$refs.canvas.toDataURL("image/jpeg").replace("image/jpeg", "image/octet-stream");
-            this.images.push(image);
+            let id = (new Date).getTime();
+
+            this.$set(this.images, id, image);
         },
 
         showingImage() {
+            
             this.$store.commit('setImages', this.images);
             // console.log(this.$store.getters.getImages);
         },
         
         initImage() {
-            this.$store.commit('setImages', []);
-            this.images = [];
+            this.$store.commit('setImages', {});
+            this.$store.commit('setTargets', {});
+            this.$store.commit('setUpdateQueue', []);
+            this.images = {};
         }
     }
 }

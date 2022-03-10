@@ -2,16 +2,15 @@
     <div class="default-frame">
         <div>
             <div class="outter-frame mt-3 mb-3">
-                <div class="inner-frame d-flex justify-content-center align-items-center mb-4" ref="booth">
-                    <div v-show="!isLoading" class="booth">
-                        <video v-show="!isPhotoTaken" ref="camera" class="canvas" :height="boothHeight" :width="boothWidth" autoplay></video>
-                        <canvas v-show="isPhotoTaken" id="photoTaken" class="canvas" :height="boothHeight" :width="boothWidth" ref="canvas"></canvas>
-                    </div>
-                </div>
-                <div class="inner-frame d-flex justify-content-center align-items-center">
-                    <div class="booth">
-                        <video v-show="!isPhotoTaken" ref="camera-2" class="canvas" :height="boothHeight" :width="boothWidth" autoplay></video>
-                        <canvas v-show="isPhotoTaken" id="photo-2" class="canvas" :height="boothHeight" :width="boothWidth" ref="canvas-2"></canvas>
+                <div class="inner-frame d-flex justify-content-center align-items-center mb-4" v-for="(item, idx) of [1, 2]" :key="idx">
+                    <div class="booth" @drop="drop" @dragover.prevent>
+                        <div v-if="!images[item]" class="image">
+                            <canvas class="inner-image" :id="`canvas-${item}`" ></canvas>
+                        </div>
+                        <div v-else>
+                            <img class="inner-image" :src="images[item]" :id="`canvas-${item}`" alt="" draggable="false">
+                            <div class="overlay" @click="removeImg(item)"><i class="mdi mdi-close"></i></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -20,74 +19,37 @@
 </template>
 
 <script>
+import draggable from "vuedraggable";
+
 export default {
     name: 'DefaultFrame',
+    components: {
+        draggable,
+    },
     data() {
         return {
-            boothWidth: null,
-            boothHeight: null,
-            isCameraOpen: false,
-            isPhotoTaken: false,
-            isShotPhoto: false,
-            isLoading: false,
-            isTarget: null,
+            images: {},
         }
     },
     created() {
     },
     mounted() {
-        this.calcBoothSize();
-        // this.createCameraElement();
+        this.images = this.$store.getters.getTargets;
     },
     methods: {
-        calcBoothSize() {
-            this.boothWidth = this.$refs.booth.clientWidth
-            this.boothHeight = this.$refs.booth.clientHeight
+        drop(e) {
+            this.$store.commit('setTarget', [e.target.id.split('-')[1], e.dataTransfer.getData('text/plain')]);
+            this.images = this.$store.getters.getTargets;
         },
 
-        createCameraElement() {
-            this.isLoading = true;
+        removeImg(target) {
+            this.images[target] = null;
+            delete this.images[target]
+            this.$store.commit('setTargets', this.images);
+            this.$store.commit('setRemoveQueue', target);
+            this.images = this.$store.getters.getTargets;
+            console.log(this.$store.getters.getRemoveQueues);
 
-            const constraints = (window.constraints = {
-                audio: false,
-                video: true
-            });
-
-
-            navigator.mediaDevices.getUserMedia(constraints)
-                .then(stream => {
-                    this.isLoading = false;
-                    this.$refs.camera.srcObject = stream;
-                })
-                .catch(error => {
-                    this.isLoading = false;
-                    alert("카메라 설정 중 에러발생");
-            });
-        },
-
-        stopCameraStream() {
-            let tracks = this.$refs.camera.srcObject.getTracks();
-
-            tracks.forEach(track => {
-                track.stop();
-            });
-        },
-
-        takePhoto() {
-            if (!this.isPhotoTaken) {
-                this.isShotPhoto = true;
-
-                const FLASH_TIMEOUT = 50;
-
-                setTimeout(() => {
-                    this.isShotPhoto = false;
-                }, FLASH_TIMEOUT);
-            }
-
-            this.isPhotoTaken = !this.isPhotoTaken;
-
-            const context = this.$refs.canvas.getContext('2d');
-            context.drawImage(this.$refs.camera, 0, 0, this.boothWidth, this.boothHeight);
         },
     }
 }
@@ -101,21 +63,21 @@ export default {
     box-shadow: 0.5px 0.5px 1.5px black;
 }
 
-.inner-frame {
-    height: 40%;
-}
-
-.takePic {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    box-shadow: 1px 1px 3px black;
-}
-
-.canvas {
+.inner-image {
+    height: 180px;
+    width: 250px;
     box-shadow: 0.5px 0.5px 1.5px black;
 }
 
+.overlay {
+    position: absolute;
+    font-size: 30px;
+    top: -4%;
+    left: 88%;
+}
+.booth {
+    position: relative;
+}
 video {
     object-fit: cover;
 }
