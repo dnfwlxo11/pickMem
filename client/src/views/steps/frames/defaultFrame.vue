@@ -21,9 +21,6 @@ import draggable from "vuedraggable";
 
 export default {
     name: 'DefaultFrame',
-    components: {
-        draggable,
-    },
     data() {
         return {
             images: {},

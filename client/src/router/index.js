@@ -15,6 +15,11 @@ const routes = [
     path: '/pickMem',
     name: 'PickMem',
     component: PickMem,
+    beforeEnter: (to, from, next) => {
+      console.log(to, from, 'to, from')
+      // if (to.path != '/') next('/');
+      next();
+    }
   },
 ]
 

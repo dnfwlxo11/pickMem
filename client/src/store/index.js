@@ -6,6 +6,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     images: {},
+    frame: null,
     selectTarget: {},
     removeQueue: [],
   },
@@ -24,6 +25,9 @@ export default new Vuex.Store({
     },
     setUpdateQueue(state, targetArr) {
       state.removeQueue = targetArr;
+    },
+    setFrame(state, frame) {
+      state.frame = frame;
     }
   },
   getters: {
@@ -33,14 +37,14 @@ export default new Vuex.Store({
     getTargets(state) {
       return state.selectTarget;
     },
-    getTargets(state) {
-      return state.selectTarget;
-    },
     getRemoveQueues(state) {
       return state.removeQueue;
     },
     getRemoveQueueCnt(state) {
       return state.removeQueue.length;
+    },
+    getFrame(state) {
+      return state.frame;
     }
   },
   actions: {
