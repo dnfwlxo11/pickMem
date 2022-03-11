@@ -8,7 +8,7 @@
                     <step-three v-else-if="step==2" @on-next="nextStep" @on-previous="previousStep"></step-three>
                     <step-four v-else-if="step==3" @on-next="nextStep" @on-previous="previousStep"></step-four>
                     <step-five v-else-if="step==4" @on-next="nextStep" @on-previous="previousStep"></step-five>
-                    <result v-else></result>
+                    <step-result v-else @on-previous="previousStep"></step-result>
                 </div>
             </div>
         </div>
@@ -21,7 +21,7 @@ import stepTwo from '../steps/stepTwo.vue';
 import stepThree from '../steps/stepThree.vue';
 import stepFour from '../steps/stepFour.vue';
 import stepFive from '../steps/stepFive.vue';
-import result from '../steps/result.vue';
+import stepResult from '../steps/stepResult.vue';
 
 export default {
     name: 'PickMem',
@@ -31,7 +31,7 @@ export default {
         stepThree,
         stepFour,
         stepFive,
-        result,
+        stepResult,
     },
     data() {
         return {

@@ -6,9 +6,9 @@
                 <hr>
             </div>
             <div class="picture mb-3">
-                <div v-show="!isLoading" ref="booth">
-                    <video v-show="!isPhotoTaken" class="canvas" :width="boothWidth" ref="camera"  :height="500" autoplay></video>
-                    <canvas v-show="isPhotoTaken" id="photoTaken" class="canvas" :width="boothWidth" :height="500" ref="canvas"></canvas>
+                <div v-show="!isLoading" class="text-center" ref="booth">
+                    <video v-show="!isPhotoTaken" class="canvas" :width="600" :height="450" ref="camera" autoplay></video>
+                    <canvas v-show="isPhotoTaken" id="photoTaken" class="canvas" :width="600" :height="450" ref="canvas"></canvas>
                 </div>
                 <div v-if="isLoading" style="font-size: 20px;height: 500px;">
                     <div class="text-center">
@@ -65,7 +65,7 @@ export default {
     methods: {
         calcBoothSize() {
             this.boothWidth = this.$refs.booth.clientWidth;
-            this.boothHeight = this.$refs.booth.clientHeight;
+            this.boothHeight = (this.boothWidth * 3) / 4;
         },
 
         createCameraElement() {
@@ -111,7 +111,7 @@ export default {
 
             const context = this.$refs.canvas.getContext('2d');
             
-            context.drawImage(this.$refs.camera, 0, 0, this.boothWidth, 500);
+            context.drawImage(this.$refs.camera, 0, 0, 600, 450);
             this.saveImage();
         },
 
