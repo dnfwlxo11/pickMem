@@ -6,6 +6,9 @@
                     <step-one v-if="step==0" @on-next="nextStep" @on-previous="previousStep"></step-one>
                     <step-two v-else-if="step==1" @on-next="nextStep" @on-previous="previousStep"></step-two>
                     <step-three v-else-if="step==2" @on-next="nextStep" @on-previous="previousStep"></step-three>
+                    <step-four v-else-if="step==3" @on-next="nextStep" @on-previous="previousStep"></step-four>
+                    <step-five v-else-if="step==4" @on-next="nextStep" @on-previous="previousStep"></step-five>
+                    <result v-else></result>
                 </div>
             </div>
         </div>
@@ -16,6 +19,9 @@
 import stepOne from '../steps/stepOne.vue';
 import stepTwo from '../steps/stepTwo.vue';
 import stepThree from '../steps/stepThree.vue';
+import stepFour from '../steps/stepFour.vue';
+import stepFive from '../steps/stepFive.vue';
+import result from '../steps/result.vue';
 
 export default {
     name: 'PickMem',
@@ -23,6 +29,9 @@ export default {
         stepOne,
         stepTwo,
         stepThree,
+        stepFour,
+        stepFive,
+        result,
     },
     data() {
         return {
@@ -31,7 +40,7 @@ export default {
     },
     methods: {
         nextStep() {
-            if (this.step == 2) return;
+            if (this.step == 5) return;
             if (this.step == 1 && Object.keys(this.$store.getters.getImages).length < 6) return; 
             this.step += 1;
         },

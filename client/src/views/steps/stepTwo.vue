@@ -66,7 +66,6 @@ export default {
         calcBoothSize() {
             this.boothWidth = this.$refs.booth.clientWidth;
             this.boothHeight = this.$refs.booth.clientHeight;
-            console.log(this.boothWidth, this.boothHeight, 'init')
         },
 
         createCameraElement() {
@@ -111,8 +110,6 @@ export default {
             // this.isPhotoTaken = !this.isPhotoTaken;
 
             const context = this.$refs.canvas.getContext('2d');
-
-            console.log(this.$refs.camera.clientHeight, 'client Heiht')
             
             context.drawImage(this.$refs.camera, 0, 0, this.boothWidth, 500);
             this.saveImage();
@@ -126,9 +123,7 @@ export default {
         },
 
         showingImage() {
-            
             this.$store.commit('setImages', this.images);
-            // console.log(this.$store.getters.getImages);
         },
         
         initImage() {

@@ -77,17 +77,9 @@
 </template>
 
 <script>
-import defaultFrame from './frames/defaultFrame.vue'
-import onethreeFrame from './frames/onethreeFrame.vue'
-import onefourFrame from './frames/onefourFrame.vue'
 
 export default {
     name: 'StepOne',
-    components: {
-        defaultFrame,
-        onethreeFrame,
-        onefourFrame
-    },
     data() {
         return {
             targetFrame: null,
@@ -98,7 +90,8 @@ export default {
     },
     methods: {
         selectFrame(id) {
-            this.targetFrame = id;
+            if (this.targetFrame == id) this.targetFrame = null;
+            else this.targetFrame = id;
         },
         nextStep() {
             if (!this.targetFrame) return;
