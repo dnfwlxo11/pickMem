@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    workCanvas: null,
     images: {},
     frame: null,
     selectTarget: {},
@@ -28,6 +29,9 @@ export default new Vuex.Store({
     },
     setFrame(state, frame) {
       state.frame = frame;
+    },
+    setCanvas(state, canvas) {
+      state.canvas = canvas
     }
   },
   getters: {
@@ -45,7 +49,10 @@ export default new Vuex.Store({
     },
     getFrame(state) {
       return state.frame;
-    }
+    },
+    getCanvas(state) {
+      return state.canvas;
+    },
   },
   actions: {
   },
