@@ -15,7 +15,8 @@
                 배경 | 스티커 
                 <hr>
                 <div style="height: 450px;overflow-y: auto;">
-                    <button class="btn btn-outline-primary" @click="createObj('text')">텍스트</button>
+                    <button :class="{'btn-primary': isText, 'btn-outline-primary': !isText}" class="btn mr-3" @click="isText=!isText">텍스트</button>
+                    <input type="number" v-model="fontSize">
                 </div>
             </div>
         </dir>
@@ -42,10 +43,11 @@ export default {
         return {
             frame: null,
             isOpen: false,
+            isText: false,
             canvasHeight: null,
             canvasWidth: null,
             canvas: null,
-            fontSize: 15,
+            fontSize: 16,
         }
     },
     created() {
@@ -58,7 +60,10 @@ export default {
         this.canvas.setHeight(this.canvasHeight);
         this.canvas.setWidth(this.canvasWidth);
         this.canvas.on('mouse:down', (e) => {
-            if (e.target) {
+            console.log(e)
+            if (this.isText) {
+                this.createObj('text', e.pointer.x, e.pointer.y)
+            } else if (e.target) {
                 e.target.opacity = 0.5;
                 this.canvas.renderAll();
             }
@@ -70,15 +75,14 @@ export default {
         });
     },
     methods: {
-        createObj(type) {
+        createObj(type, left, top) {
             if (type == 'text') {
                 let textBox = new fabric.Textbox('내용을 입력하세요.', {
-                    left: 30,
-                    top: 30,
+                    left: left,
+                    top: top,
                     width: 150,
                     fontSize: this.fontSize,
                     textAlign: 'left',
-                    id: `textBox_${(new Date).getTime()}`
                 });
 
                 this.canvas.add(textBox);
@@ -106,13 +110,13 @@ export default {
                 textBox.on(("changed"), () => {
 
                     let actualWidth = textBox.scaleX * textBox.width;
-                    let largest = this.canvas.getActiveObject().__lineWidths.filter(item => item)[0] ? this.canvas.getActiveObject().__lineWidths.filter(item => item)[0] : 10;
+                    let largest = this.canvas.getActiveObject().__lineWidths.filter(item => item)[0] ? this.canvas.getActiveObject().__lineWidths.filter(item => item)[0] : 1;
                     let tryWidth = (largest + 15) * textBox.scaleX;
 
                     this.canvas.getActiveObject().set("width", tryWidth);
 
                     if ((textBox.left + actualWidth) >= this.canvas.width - 10) {
-                        textBox.set("width", this.canvas.width - 30)
+                        textBox.set("width", this.canvas.width - left - 10)
                     }
 
                     this.canvas.renderAll();
@@ -121,6 +125,8 @@ export default {
                 textBox.on(("modified"), () => {
                     this.canvas.renderAll();
                 });
+
+                this.isText = false;
             }
         }
     },
