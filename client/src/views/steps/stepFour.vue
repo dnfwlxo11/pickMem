@@ -6,7 +6,7 @@
         </div>
         <dir class="row">
             <div class="col-8 text-center m-auto">
-                <working-frame :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></working-frame>
+                <working-frame v-if="frame" :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></working-frame>
                 <!-- <preview-frame v-if="frame" class="m-auto" :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></preview-frame> -->
             </div>
             <div class="col-4">
