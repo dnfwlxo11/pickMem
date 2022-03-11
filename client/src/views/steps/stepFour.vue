@@ -16,7 +16,6 @@
                 <hr>
                 <div style="height: 450px;overflow-y: auto;">
                     <button class="btn btn-outline-primary" @click="createObj('text')">텍스트</button>
-                    폰트 크기: <input class="text-right" type="number" v-model="fontSize">
                 </div>
             </div>
         </dir>
@@ -58,18 +57,70 @@ export default {
         this.canvas = new fabric.Canvas(this.$refs.canvas);
         this.canvas.setHeight(this.canvasHeight);
         this.canvas.setWidth(this.canvasWidth);
+        this.canvas.on('mouse:down', (e) => {
+            if (e.target) {
+                e.target.opacity = 0.5;
+                this.canvas.renderAll();
+            }
+        }).on('mouse:up', (e) => {
+            if (e.target) {
+                e.target.opacity = 1;
+                this.canvas.renderAll();
+            }
+        });
     },
     methods: {
         createObj(type) {
             if (type == 'text') {
-                let textBox = new fabric.Textbox('소중한 순간, 영원히', {
-                    left: 10,
-                    top: 10,
-                    width: this.fontSize * 10,
+                let textBox = new fabric.Textbox('내용을 입력하세요.', {
+                    left: 30,
+                    top: 30,
+                    width: 150,
                     fontSize: this.fontSize,
+                    textAlign: 'left',
+                    id: `textBox_${(new Date).getTime()}`
                 });
 
                 this.canvas.add(textBox);
+                this.canvas.renderAll();
+                
+                textBox.setControlsVisibility({
+                    mt: false, mb: false, 
+                    bl: false, br: false, 
+                    tl: false, tr: false,
+                });
+
+                textBox.on('selected', (e) => {
+                    this.canvas.renderAll();
+                });
+
+                textBox.on("editing:entered", (e) =>{
+				    let obj = this.canvas.getActiveObject();
+
+                    if (obj.text == "내용을 입력하세요."){
+                        obj.selectAll();
+                        obj.removeChars();
+                    }
+                });
+
+                textBox.on(("changed"), () => {
+
+                    let actualWidth = textBox.scaleX * textBox.width;
+                    let largest = this.canvas.getActiveObject().__lineWidths.filter(item => item)[0] ? this.canvas.getActiveObject().__lineWidths.filter(item => item)[0] : 10;
+                    let tryWidth = (largest + 15) * textBox.scaleX;
+
+                    this.canvas.getActiveObject().set("width", tryWidth);
+
+                    if ((textBox.left + actualWidth) >= this.canvas.width - 10) {
+                        textBox.set("width", this.canvas.width - 30)
+                    }
+
+                    this.canvas.renderAll();
+                });
+
+                textBox.on(("modified"), () => {
+                    this.canvas.renderAll();
+                });
             }
         }
     },
@@ -89,9 +140,9 @@ img {
 }
 
 .outter-frame {
-    padding: 20px;
-    padding-right: 0px;
-    padding-bottom: 0px;
+    // padding: 20px;
+    outline: 20px solid lightgrey;
+    outline-offset: -20px;
     box-shadow: 0.5px 0.5px 1.5px black;
 
     &-1-1 {
@@ -133,54 +184,6 @@ img {
     &-4-1 {
         height: 180px;
         width: 560px;
-    }
-}
-
-.inner-frame {
-    position: relative;
-    margin-bottom: 20px;
-    margin-right: 20px;
-    box-shadow: 0.5px 0.5px 1.5px black;
-
-    &-1-1 {
-        height: 270px;
-        width: 360px;
-    }
-    &-1-2 {
-        height: 210px;
-        width: 280px;
-    }
-    &-1-3 {
-        height: 135px;
-        width: 180px;
-    }
-    &-1-4 {
-        height: 105px;
-        width: 140px;
-    }
-    &-2-1 {
-        height: 280px;
-        width: 210px;
-    }
-    &-2-2 {
-        height: 210px;
-        width: 280px;
-    }
-    &-2-3 {
-        height: 135px;
-        width: 180px;
-    }
-    &-3-1 {
-        height: 180px;
-        width: 135px;
-    }
-    &-3-2 {
-        height: 180px;
-        width: 135px;
-    }
-    &-4-1 {
-        height: 140px;
-        width: 105px;
     }
 }
 </style>
