@@ -21,7 +21,7 @@
             <button class="btn btn-outline-primary mr-3" @click="$emit('on-previous')">이 전 단 계</button>
             <button class="btn btn-outline-primary" @click="$emit('on-next')">다 음 단 계</button>
         </div>
-        <preview-modal v-if="isOpen" @on-close="isOpen=false"></preview-modal>
+        <preview-modal v-if="isOpen" @on-close="isOpen=false" :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></preview-modal>
     </div>
 </template>
 

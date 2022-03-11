@@ -17,7 +17,7 @@
             </div>
           </div>
           <div class="modal-body d-flex justify-content-center">
-            <preview-frame></preview-frame>
+            <preview-frame :rows="rows" :columns="columns"></preview-frame>
           </div>
           <div class="modal-footer d-block">
             <button type="button" class="btn btn-sm btn-block text-success" @click="$emit('on-close')">
@@ -37,7 +37,17 @@
     name: 'previewModal',
     components: {
       previewFrame,
-    }
+    },
+    props: {
+        rows: {
+            default: 2,
+            type: Number,
+        },
+        columns: {
+            default: 1,
+            type: Number,
+        },
+    },
   }
 </script>
 
