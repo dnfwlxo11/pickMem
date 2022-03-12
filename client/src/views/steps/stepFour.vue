@@ -11,8 +11,10 @@
                 </div>
             </div>
             <div class="col-4">
+                <div class="mb-3"><button class="btn btn-outline-primary" @click="showCanvasInfo">캔버스 정보</button></div>
+                <div class="mb-3"><button class="btn btn-outline-primary" @click="saveWork">임시 저장</button></div>
                 <div class="mb-3"><button class="btn btn-outline-primary" @click="isOpen=true">미리보기</button></div>
-                배경 | 스티커 
+                배경색 | 스티커 | 커스텀
                 <hr>
                 <div style="height: 450px;overflow-y: auto;">
                     <button :class="{'btn-primary': isText, 'btn-outline-primary': !isText}" class="btn mr-3" @click="isText=!isText">텍스트</button>
@@ -59,22 +61,31 @@ export default {
         this.canvas = new fabric.Canvas(this.$refs.canvas);
         this.canvas.setHeight(this.canvasHeight);
         this.canvas.setWidth(this.canvasWidth);
-        this.canvas.on('mouse:down', (e) => {
-            console.log(e)
-            if (this.isText) {
-                this.createObj('text', e.pointer.x, e.pointer.y)
-            } else if (e.target) {
-                e.target.opacity = 0.5;
-                this.canvas.renderAll();
-            }
-        }).on('mouse:up', (e) => {
-            if (e.target) {
-                e.target.opacity = 1;
-                this.canvas.renderAll();
-            }
-        });
+
+        if (this.$store.getters.getCanvas) {
+            this.canvas.loadFromJSON(this.$store.getters.getCanvas, this.canvas.renderAll.bind(this.canvas))        
+            this.setCanvasOption();
+        }
+
+        this.setEvent();
     },
     methods: {
+        setEvent() {
+            this.canvas.on('mouse:down', (e) => {
+                console.log(e)
+                if (this.isText) {
+                    this.createObj('text', e.pointer.x, e.pointer.y)
+                } else if (e.target) {
+                    e.target.opacity = 0.5;
+                    this.canvas.renderAll();
+                }
+            }).on('mouse:up', (e) => {
+                if (e.target) {
+                    e.target.opacity = 1;
+                    this.canvas.renderAll();
+                }
+            });
+        },
         createObj(type, left, top) {
             if (type == 'text') {
                 let textBox = new fabric.Textbox('내용을 입력하세요.', {
@@ -83,6 +94,7 @@ export default {
                     width: 150,
                     fontSize: this.fontSize,
                     textAlign: 'left',
+                    id: `textBox_${(new Date).getDate()}`
                 });
 
                 this.canvas.add(textBox);
@@ -128,7 +140,56 @@ export default {
 
                 this.isText = false;
             }
-        }
+        },
+        saveWork() {
+            this.$store.commit('setCanvas', JSON.stringify(this.canvas.toObject(['id'])));
+        },
+        setCanvasOption() {
+            this.canvas.getObjects().map(item => {
+                if (item.id.includes('textBox')) {
+                    item.setControlsVisibility({
+                        mt: false, mb: false, 
+                        bl: false, br: false, 
+                        tl: false, tr: false,
+                    });
+
+                    item.on('selected', (e) => {
+                        this.canvas.renderAll();
+                    });
+
+                    item.on("editing:entered", (e) =>{
+                        let obj = this.canvas.getActiveObject();
+
+                        if (obj.text == "내용을 입력하세요."){
+                            obj.selectAll();
+                            obj.removeChars();
+                        }
+                    });
+
+                    item.on(("changed"), () => {
+
+                        let actualWidth = item.scaleX * item.width;
+                        let largest = this.canvas.getActiveObject().__lineWidths.filter(item => item)[0] ? this.canvas.getActiveObject().__lineWidths.filter(item => item)[0] : 1;
+                        let tryWidth = (largest + 15) * item.scaleX;
+
+                        this.canvas.getActiveObject().set("width", tryWidth);
+
+                        if ((item.left + actualWidth) >= this.canvas.width - 10) {
+                            item.set("width", this.canvas.width - left - 10)
+                        }
+
+                        this.canvas.renderAll();
+                    });
+
+                    item.on(("modified"), () => {
+                        this.canvas.renderAll();
+                    });
+                }
+            })
+        },
+        showCanvasInfo() {
+            console.log(this.canvas.getObjects());
+        },
     },
 }
 </script>

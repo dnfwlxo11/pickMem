@@ -31,7 +31,7 @@ export default new Vuex.Store({
       state.frame = frame;
     },
     setCanvas(state, canvas) {
-      state.canvas = canvas
+      state.workCanvas = canvas;
     }
   },
   getters: {
@@ -51,7 +51,7 @@ export default new Vuex.Store({
       return state.frame;
     },
     getCanvas(state) {
-      return state.canvas;
+      return state.workCanvas;
     },
   },
   actions: {
