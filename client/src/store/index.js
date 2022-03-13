@@ -6,6 +6,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     workCanvas: null,
+    previewImg: null,
     images: {},
     frame: null,
     selectTarget: {},
@@ -32,6 +33,9 @@ export default new Vuex.Store({
     },
     setCanvas(state, canvas) {
       state.workCanvas = canvas;
+    },
+    setPreviewImg(state, img) {
+      state.previewImg = img
     }
   },
   getters: {
@@ -53,6 +57,9 @@ export default new Vuex.Store({
     getCanvas(state) {
       return state.workCanvas;
     },
+    getPreviewImg(state) {
+      return state.previewImg;
+    }
   },
   actions: {
   },

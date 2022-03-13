@@ -1,6 +1,6 @@
 <template>
     <div class="preview-frame">
-        <div :class="`outter-frame outter-frame-${columns}-${rows}`">
+        <div :class="`outter-frame outter-frame-${columns}-${rows}`" ref='frame'>
             <div :class="`row p-0 m-0`" v-for="(row, rowIdx) of rowCnt" :key="rowIdx">
                 <div :class="`pl-0 pr-0 inner-frame inner-frame-${columns}-${rows}`" v-for="(col, colIdx) of colCnt" :key="colIdx">
                     <div :class="`inner-frame-${columns}-${rows}`">
@@ -32,6 +32,7 @@ export default {
     },
     data() {
         return {
+            previewImg: null,
             rowCnt: [],
             colCnt: [],
             images: {},
@@ -40,6 +41,11 @@ export default {
     created() {
     },
     mounted() {
+        if (this.$store.getters.getPreviewImg) {
+            this.previewImg = this.$store.getters.getPreviewImg;
+            this.$refs.frame.style.backgroundImage = `url(${this.previewImg})`
+        }
+
         this.images = this.$store.getters.getTargets;
         for (let i=1;i<=this.$props.rows;i++) this.rowCnt.push(i);
         for (let i=1;i<=this.$props.columns;i++) this.colCnt.push(i);
