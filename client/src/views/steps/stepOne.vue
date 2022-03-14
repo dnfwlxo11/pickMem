@@ -90,8 +90,19 @@ export default {
     },
     methods: {
         selectFrame(id) {
-            if (this.targetFrame == id) this.targetFrame = null;
-            else this.targetFrame = id;
+            if (this.targetFrame == id) {
+                this.targetFrame = null;
+                this.$store.commit('setTable', {
+                    'rows': 2,
+                    'columns': 1,
+                })
+            } else {
+                this.targetFrame = id;
+                this.$store.commit('setTable', {
+                    'columns': parseInt(id.split('x')[0]),
+                    'rows': parseInt(id.split('x')[1]),
+                })
+            }
         },
         nextStep() {
             if (!this.targetFrame) return;

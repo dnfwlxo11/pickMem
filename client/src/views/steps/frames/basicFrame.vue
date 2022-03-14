@@ -41,8 +41,8 @@ export default {
     },
     mounted() {
         this.images = this.$store.getters.getTargets;
-        for (let i=1;i<=this.$props.rows;i++) this.rowCnt.push(i);
-        for (let i=1;i<=this.$props.columns;i++) this.colCnt.push(i);
+        this.rowCnt = Array.from({length: this.$props.rows}, (v, i) => i + 1);
+        this.colCnt = Array.from({length: this.$props.columns}, (v, i) => i + 1);
     },
     methods: {
         drop(e) {
@@ -174,9 +174,5 @@ img {
     font-size: 30px;
     top: 0%;
     left: 0%;
-}
-
-.booth {
-    position: relative;
 }
 </style>

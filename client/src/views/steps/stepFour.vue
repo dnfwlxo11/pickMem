@@ -1,4 +1,4 @@
-<template>
+    <template>
     <div class="step-four">
         <div style="font-size: 20px;">
             <strong>Step 4. 프레임 꾸미기</strong>
@@ -7,30 +7,51 @@
         <dir class="row">
             <div class="col-8">
                 <div class="d-flex justify-content-center align-items-center">
-                    <canvas v-if="frame" :class="`outter-frame outter-frame-${parseInt(frame.split('x')[0])}-${parseInt(frame.split('x')[1])}`" ref="canvas"></canvas>
-                </div>
-            </div>
-            <div class="col-4">
-                <div class="mb-3"><button class="btn btn-outline-primary" @click="saveWork">임시 저장</button></div>
-                <div class="mb-3"><button class="btn btn-outline-primary" @click="isOpen=true">미리보기</button></div>
-                배경색 | 스티커 | 커스텀
-                <hr>
-                <div class="mb-3">
-                <!-- <div style="height: 450px;overflow-y: auto;"> -->
-                    <button :class="{'btn-primary': isText, 'btn-outline-primary': !isText}" class="btn mr-3" @click="isText=!isText">텍스트</button>
-                    <input type="number" v-model="fontSize">
-                </div>
-                <div style="height: 300px;overflow-y: auto;">
-                    스티커
-                    <hr>
-                    <div v-for="(value, theme) in sticker" :key="theme">
-                        <div class="mb-3"><strong>{{theme}} 테마</strong></div>
-                        <div class="row m-0 p-0 mb-5">
-                            <div class="col-3 mb-3" v-for="(item, idx) of value" :key="idx" @click="selectSticker(theme, item)">
-                                <img :id="`${theme}_${item}`" class="sticker" :src="`/stickers/${theme}_${item}.png`">
+                    <div ref="pic" :class="`outter-frame-${parseInt(frame.split('x')[0])}-${parseInt(frame.split('x')[1])}`" style="position: absolute; padding: 20px;">
+                        <div :class="`row p-0 m-0`" v-for="(row, rowIdx) of rowCnt" :key="rowIdx">
+                            <div :class="`pl-0 pr-0 inner-frame inner-frame-${columns}-${rows}`" v-for="(col, colIdx) of colCnt" :key="colIdx">
+                                <div :class="`inner-frame-${columns}-${rows}`">
+                                    <img :src="images[rowIdx*colCnt.length + col]" :id="`canvas-${rowIdx*colCnt.length + col}`" :draggable="false">
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <div ref="deco">
+                        <canvas v-if="frame" :class="`outter-frame outter-frame-${parseInt(frame.split('x')[0])}-${parseInt(frame.split('x')[1])}`" ref="canvas"></canvas>
+                    </div>
+                </div>
+                <div class="text-center"><small>실제 효과들은 사진 뒤에 표시됩니다. <br> 미리보기 모드를 통해 확인할 수 있습니다.</small></div>
+            </div>
+            <div class="col-4">
+                <div class="row m-0 p-0 mb-3">
+                    <div class="col-3 mr-1"><button class="btn btn-outline-primary" @click="saveWork">저장</button></div>
+                    <div class="col-3 mr-1"><button class="btn btn-outline-primary" @click="isWork=!isWork;setWorkMode()">{{isWork ? "수정" : "관전" }}</button></div>
+                    <div class="col-4"><button class="btn btn-outline-primary" @click="isOpen=true">미리보기</button></div>
+                </div>
+                <span @click="isMode='bg'">배경색</span> | <span @click="isMode='sticker'">스티커</span> | <span @click="isMode='custom'">커스텀</span>
+                <hr>
+                <div v-if="isMode=='bg'">
+                    <div style="height: 450px;overflow-y: auto;">
+                        <button :class="{'btn-primary': isText, 'btn-outline-primary': !isText}" class="btn mr-3" @click="isText=!isText">텍스트</button>
+                        <input type="number" v-model="fontSize">
+                    </div>
+                </div>
+                <div v-else-if="isMode=='sticker'">
+                    <div style="height: 450px;overflow-y: auto;">
+                        스티커
+                        <hr>
+                        <div v-for="(value, theme) in sticker" :key="theme">
+                            <div class="mb-3"><strong>{{theme}} 테마</strong></div>
+                            <div class="row m-0 p-0 mb-5">
+                                <div :id="`${theme}_${item}`" :class="{ 'target': targetSticker == `${theme}_${item}` }" class="col-3 mb-3 text-center" v-for="(item, idx) of value" :key="idx" @click="isSticker=!isSticker;selectSticker(`${theme}_${item}`)">
+                                    <img :ref="`${theme}_${item}`" class="sticker" :src="`/stickers/${theme}_${item}.png`">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-else-if="isMode=='custom'">
+
                 </div>
             </div>
         </dir>
@@ -55,9 +76,18 @@ export default {
     },
     data() {
         return {
+            rows: 2,
+            columns: 1,
+            rowCnt: [],
+            colCnt: [],
+            images: {},
+            targetSticker: null,
             frame: null,
+            isMode: 'bg',
+            isWork: false,
             isOpen: false,
             isText: false,
+            isSticker: false,
             canvasHeight: null,
             canvasWidth: null,
             canvas: null,
@@ -73,6 +103,12 @@ export default {
         this.frame = this.$store.getters.getFrame;
     },
     mounted() {
+        this.images = this.$store.getters.getTargets;
+        let table = this.$store.getters.getTable;
+        this.rows = table.rows;
+        this.columns = table.columns;
+        this.rowCnt = Array.from({length: table.rows}, (v, i) => i + 1);
+        this.colCnt = Array.from({length: table.columns}, (v, i) => i + 1);
         this.sticker.cute_handdrawn = Array.from({length: 6}, (v, i) => i + 1);
         this.sticker.cute_natural_doodle = Array.from({length: 12}, (v, i) => i + 1);
         this.sticker.flower_leaf = Array.from({length: 38}, (v, i) => i + 1);
@@ -89,13 +125,18 @@ export default {
         }
 
         this.setEvent();
+        this.setWorkMode();
     },
     methods: {
         setEvent() {
             this.canvas.on('mouse:down', (e) => {
-                console.log(e)
+                console.log('this.isWork', this.isWork)
+                if (!this.isWork) return;
+
                 if (this.isText) {
-                    this.createObj('text', e.pointer.x, e.pointer.y)
+                    this.createObj('text', e.pointer.x, e.pointer.y);
+                } else if (this.isSticker) {
+                    this.createObj('sticker', e.pointer.x, e.pointer.y);
                 } else if (e.target) {
                     e.target.opacity = 0.5;
                     this.canvas.renderAll();
@@ -124,6 +165,16 @@ export default {
                 this.setTextEvent(textBox);
 
                 this.isText = false;
+            } else if (type == 'sticker') {
+                let image = new fabric.Image(this.$refs[this.targetSticker][0], {
+                    left: left,
+                    top: top
+                });
+                
+                this.canvas.add(image);
+                this.canvas.renderAll();
+
+                this.isSticker = false;
             }
         },
         saveWork() {
@@ -176,9 +227,19 @@ export default {
                 }
             })
         },
-        selectSticker(theme, idx) {
-            console.log(theme, idx);
-        }
+        selectSticker(id) {
+            if (this.targetSticker == id) this.targetSticker = null;
+            else this.targetSticker = id;
+        },
+        setWorkMode() {
+            if (this.isWork) {
+                this.$refs.pic.style['z-index'] = 1;
+                this.$refs.deco.style['z-index'] = 2;
+            } else {
+                this.$refs.pic.style['z-index'] = 2;
+                this.$refs.deco.style['z-index'] = 1; 
+            }
+        },
     },
 }
 </script>
@@ -244,5 +305,57 @@ img {
         height: 180px;
         width: 560px;
     }
+}
+
+.inner-frame {
+    position: relative;
+    margin-bottom: 20px;
+    margin-right: 20px;
+    box-shadow: 0.5px 0.5px 1.5px black;
+
+    &-1-1 {
+        height: 270px;
+        width: 360px;
+    }
+    &-1-2 {
+        height: 210px;
+        width: 280px;
+    }
+    &-1-3 {
+        height: 135px;
+        width: 180px;
+    }
+    &-1-4 {
+        height: 105px;
+        width: 140px;
+    }
+    &-2-1 {
+        height: 280px;
+        width: 210px;
+    }
+    &-2-2 {
+        height: 210px;
+        width: 280px;
+    }
+    &-2-3 {
+        height: 135px;
+        width: 180px;
+    }
+    &-3-1 {
+        height: 180px;
+        width: 135px;
+    }
+    &-3-2 {
+        height: 180px;
+        width: 135px;
+    }
+    &-4-1 {
+        height: 140px;
+        width: 105px;
+    }
+}
+
+.target {
+    background-color: grey;
 }
 </style>

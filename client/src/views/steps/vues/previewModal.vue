@@ -53,7 +53,7 @@
 
 <style lang="scss" scoped>
   .modal-container {
-    max-width: 480px;
+    max-width: 640px;
     margin-top: 100px;
   }
 

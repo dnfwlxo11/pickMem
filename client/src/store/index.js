@@ -5,6 +5,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    rows: 2,
+    columns: 1,
     workCanvas: null,
     previewImg: null,
     images: {},
@@ -36,6 +38,10 @@ export default new Vuex.Store({
     },
     setPreviewImg(state, img) {
       state.previewImg = img
+    },
+    setTable(state, table) {
+      state.rows = table.rows;
+      state.columns = table.columns;
     }
   },
   getters: {
@@ -59,6 +65,12 @@ export default new Vuex.Store({
     },
     getPreviewImg(state) {
       return state.previewImg;
+    },
+    getTable(state) {
+      return {
+        rows: state.rows,
+        columns: state.columns,
+      }
     }
   },
   actions: {
