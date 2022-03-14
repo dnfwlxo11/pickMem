@@ -94,7 +94,7 @@ export default {
         // this.calcBoothSize();
         this.createCameraElement();
     },
-    beforeDestoyed() {
+    destoyed() {
         this.stopCameraStream();
     },
     methods: {

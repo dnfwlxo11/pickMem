@@ -1,7 +1,14 @@
     <template>
     <div class="step-four">
         <div style="font-size: 20px;">
-            <strong>Step 4. 프레임 꾸미기</strong>
+            <div class="row m-0 p-0 w-100">
+                <div class="col-6 p-0 m-0 text-left"><strong>Step 4. 프레임 꾸미기</strong></div>
+                <div class="col-6 p-0 m-0 text-right">
+                    <button class="btn btn-outline-primary mr-2" @click="saveWork">저장</button>
+                    <button class="btn btn-outline-primary mr-2" @click="isWork=!isWork;setWorkMode()">{{isWork ? "수정" : "관전" }}</button>
+                    <button class="btn btn-outline-primary" @click="isOpen=true">미리보기</button>
+                </div>
+            </div>
             <hr>
         </div>
         <dir class="row">
@@ -23,12 +30,7 @@
                 <div class="text-center"><small>실제 효과들은 사진 뒤에 표시됩니다. <br> 미리보기 모드를 통해 확인할 수 있습니다.</small></div>
             </div>
             <div class="col-4">
-                <div class="row m-0 p-0 mb-3">
-                    <div class="col-3 mr-1"><button class="btn btn-outline-primary" @click="saveWork">저장</button></div>
-                    <div class="col-3 mr-1"><button class="btn btn-outline-primary" @click="isWork=!isWork;setWorkMode()">{{isWork ? "수정" : "관전" }}</button></div>
-                    <div class="col-4"><button class="btn btn-outline-primary" @click="isOpen=true">미리보기</button></div>
-                </div>
-                <span @click="isMode='bg'">배경색</span> | <span @click="isMode='sticker'">스티커</span> | <span @click="isMode='custom'">커스텀</span>
+                <span @click="isMode='bg'">배경색</span> | <span @click="isMode='sticker'">스티커</span>
                 <hr>
                 <div v-if="isMode=='bg'"  style="height: 450px;overflow-y: auto;">
                     <div v-for="(value, theme) in bg" :key="theme">
@@ -41,7 +43,7 @@
                     </div>
                 </div>
                 <div v-else-if="isMode=='sticker'" style="height: 450px;overflow-y: auto;">
-                    <div class="mb-2">
+                    <div class="mb-5">
                         <button :class="{'btn-primary': isText, 'btn-outline-primary': !isText}" class="btn mr-3" @click="isText=!isText">텍스트</button>
                         <input type="number" v-model="fontSize">
                     </div>
@@ -55,9 +57,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div v-else-if="isMode=='custom'">
-
                 </div>
             </div>
         </dir>
@@ -105,48 +104,12 @@ export default {
                 'flower_leaf': [],
             },
             bg: {
-                'simple': [
-                    '#F2F2F3',
-                    '#A6A6A6',
-                    '#595959',
-                    '#262626',
-                    '#0D0D0D',
-                ],
-                'modern': [
-                    '#131B26',
-                    '#D9B95B',
-                    '#D9C484',
-                    '#F2ECE4',
-                    '#D97D5B',
-                ],
-                'warm': [
-                    '#D9C077',
-                    '#F29F05',
-                    '#D97904',
-                    '#BF4904',
-                    '#F2F2F2',
-                ],
-                'astro': [
-                    '#F25E7A',
-                    '#4A2B8C',
-                    '#5155A6',
-                    '#05F2DB',
-                    '#F2E963',
-                ],
-                'cartoon': [
-                    '#636AF2',
-                    '#41A0F2',
-                    '#A2DCF2',
-                    '#04D98B',
-                    '#F2E205',  
-                ],
-                'ancient': [
-                    '#1D5948',
-                    '#F2BF5E',
-                    '#A6864B',
-                    '#F2D091',
-                    '#732509',   
-                ],
+                'simple': ['#F2F2F3', '#A6A6A6', '#595959', '#262626', '#0D0D0D'],
+                'modern': ['#131B26', '#D9B95B', '#D9C484', '#F2ECE4', '#D97D5B'],
+                'warm': ['#D9C077', '#F29F05', '#D97904', '#BF4904', '#F2F2F2'],
+                'astro': ['#F25E7A', '#4A2B8C', '#5155A6', '#05F2DB', '#F2E963'],
+                'cartoon': ['#636AF2', '#41A0F2', '#A2DCF2', '#04D98B', '#F2E205'],
+                'ancient': ['#1D5948', '#F2BF5E', '#A6864B', '#F2D091', '#732509'],
             }
         }
     },
@@ -155,6 +118,10 @@ export default {
     },
     mounted() {
         this.init();
+        window.addEventListener('keydown', this.setKeydownEvent);
+    },
+    destroyed() {
+         window.removeEventListener('keydown', this.setKeydownEvent);
     },
     methods: {
         init() {
@@ -180,12 +147,11 @@ export default {
                 this.setCanvasOption();
             }
 
-            this.setEvent();
+            this.setMouseEvent();
             this.setWorkMode();
         },
-        setEvent() {
+        setMouseEvent() {
             this.canvas.on('mouse:down', (e) => {
-                console.log('this.isWork', this.isWork)
                 if (!this.isWork) return;
 
                 if (this.isText) {
@@ -201,7 +167,22 @@ export default {
                     e.target.opacity = 1;
                     this.canvas.renderAll();
                 }
-            });
+            }).on('selection:created', (e) => {
+                if (e.selected.length > 1) this.canvas.discardActiveObject().renderAll();
+            })
+        },
+        setKeydownEvent(e) {
+            const allowKeys = [' ', 'DELETE']
+            let pressKey = e.key.toUpperCase();
+
+            if (!allowKeys.includes(pressKey)) return false
+                
+            if (pressKey == 'DELETE') {
+                let targetObj = this.canvas.getActiveObject();
+
+                this.canvas.remove(targetObj);
+                this.canvas.renderAll();
+            }
         },
         createObj(type, left, top) {
             if (type == 'text') {
