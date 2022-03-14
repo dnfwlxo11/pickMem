@@ -106,7 +106,7 @@ export default {
             },
             bg: {
                 'simple': [
-                    '#F2F2F2',
+                    '#F2F2F3',
                     '#A6A6A6',
                     '#595959',
                     '#262626',
@@ -290,6 +290,8 @@ export default {
             else this.targetSticker = id;
         },
         setWorkMode() {
+            this.canvas.discardActiveObject().renderAll();
+
             if (this.isWork) {
                 this.$refs.pic.style['z-index'] = 1;
                 this.$refs.deco.style['z-index'] = 2;
@@ -383,6 +385,7 @@ img {
     position: relative;
     margin-bottom: 20px;
     margin-right: 20px;
+    background: #FFF;
     box-shadow: 0.5px 0.5px 1.5px black;
 
     &-1-1 {

@@ -37,13 +37,14 @@
                     </div>
                     <div v-else class="m-auto h-100">
                         <div class="h-100" style="box-shadow: 1px 1px 3px black;">
-                            <div class="m-auto row" v-for="(row, rowIdx) of [0, 1]" :key="rowIdx">
-                                <div class="col-4" v-for="(col, colIdx) of [0, 1, 2]" :key="colIdx">
-                                    <div v-if="Object.values(images)[rowIdx*3 + col]" class="card m-auto">
+                            <div class="m-auto row h-50" v-for="(row, rowIdx) of [0, 1]" :key="rowIdx">
+                                <div class="col-4 m-auto" v-for="(col, colIdx) of [0, 1, 2]" :key="colIdx">
+                                    <div v-if="Object.values(images)[rowIdx*3 + col]" class="card m-auto" style="position: relative;">
                                         <img class="uploadImage" :src="`${Object.values(images)[rowIdx*3 + col]}`">
+                                        <div class="overlay"><i class="mdi mdi-close" @click="removeImg(Object.keys(images)[rowIdx*3 + col])"></i></div>
                                     </div>
-                                    <div v-else class="text-center" @click="onUploadClick">
-                                        <i class="mdi mdi-arrow-up-bold" style="font-size: 70px;"></i>
+                                    <div v-else class="text-center card" @click="onUploadClick">
+                                        <i class="mdi mdi-arrow-up-bold" style="font-size: 60px;"></i>
                                         <div><strong>사진 올리기</strong></div>
                                     </div>
                                 </div>
@@ -169,6 +170,12 @@ export default {
             this.images = {};
         },
 
+        removeImg(target) {
+            this.images[target] = null;
+            this.$delete(this.images, target);
+            this.$store.commit('setImages', this.images);
+        },
+
         onUploadClick() {
             console.log(this.images, 'upload');
             this.$refs.fileInput.click();
@@ -223,7 +230,15 @@ export default {
     height: 120px;
 }
 
+.overlay {
+    position: absolute;
+    font-size: 30px;
+    top: 0%;
+    left: 0%;
+}
+
 video {
     object-fit: cover;
 }
+
 </style>

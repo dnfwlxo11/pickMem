@@ -56,7 +56,7 @@ export default {
 
         removeImg(target) {
             this.images[target] = null;
-            delete this.images[target]
+            this.$delete(this.images, target);
             this.$store.commit('setTargets', this.images);
             this.$store.commit('setRemoveQueue', target);
             this.images = this.$store.getters.getTargets;
@@ -125,6 +125,7 @@ img {
     position: relative;
     margin-bottom: 20px;
     margin-right: 20px;
+    background: #FFF;
     box-shadow: 0.5px 0.5px 1.5px black;
 
     &-1-1 {

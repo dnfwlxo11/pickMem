@@ -113,6 +113,7 @@ img {
     position: relative;
     margin-bottom: 20px;
     margin-right: 20px;
+    background: #FFF;
     box-shadow: 0.5px 0.5px 1.5px black;
 
     &-1-1 {
