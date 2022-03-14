@@ -6,27 +6,57 @@
                 <hr>
             </div>
             <div class="picture mb-3">
-                <div v-show="!isLoading" class="text-center" ref="booth">
-                    <video v-show="!isPhotoTaken" class="canvas" :width="600" :height="450" ref="camera" autoplay></video>
-                    <canvas v-show="isPhotoTaken" id="photoTaken" class="canvas" :width="600" :height="450" ref="canvas"></canvas>
+                <div v-if="!isLoading && canPhoto" class="text-center" ref="booth">
+                    <div>
+                        <video v-show="!isPhotoTaken" class="canvas" :width="600" :height="450" ref="camera" autoplay></video>
+                        <canvas v-show="isPhotoTaken" id="photoTaken" class="canvas" :width="600" :height="450" ref="canvas"></canvas>
+                    </div>
+                    <div class="text-right">
+                        ( {{getImageLen}} / 6 )
+                    </div>
+                    <div v-if="getImageLen < 6" class="takePic d-flex justify-content-center align-items-center ml-auto mr-auto">
+                        <i class="mdi mdi-camera-outline" style="font-size: 30px;" @click="takePhoto"></i>
+                    </div>
+                    <div v-else class="text-center">
+                        <div class="text-center mb-2">다음 단계를 진행해주세요!</div>
+                        <div><button class="btn btn-outline-danger" @click="initImage">초기화</button></div>
+                    </div>
                 </div>
-                <div v-if="isLoading" style="font-size: 20px;height: 500px;">
+                <div v-else-if="isLoading" style="font-size: 20px;height: 500px;">
                     <div class="text-center">
                         <div><i class="mdi mdi-loading mdi-spin"></i></div>
                         <small>카메라 설정 중</small>
                     </div>
                 </div>
-                <div class="text-right">
-                    ( {{Object.keys(images).length}} / 6 )
+                <div v-else class="m-auto" style="height: 450px; width: 600px;">
+                    <div v-if="!getImageLen" class="h-100 card" @click="onUploadClick">
+                        <div class="m-auto">
+                            <i class="mdi mdi-arrow-up-bold" style="font-size: 70px;"></i>
+                            <div><strong>사진 올리기</strong></div>
+                        </div>                        
+                    </div>
+                    <div v-else class="m-auto h-100">
+                        <div class="h-100" style="box-shadow: 1px 1px 3px black;">
+                            <div class="m-auto row" v-for="(row, rowIdx) of [0, 1]" :key="rowIdx">
+                                <div class="col-4" v-for="(col, colIdx) of [0, 1, 2]" :key="colIdx">
+                                    <div v-if="Object.values(images)[rowIdx*3 + col]" class="card m-auto">
+                                        <img class="uploadImage" :src="`${Object.values(images)[rowIdx*3 + col]}`">
+                                    </div>
+                                    <div v-else class="text-center" @click="onUploadClick">
+                                        <i class="mdi mdi-arrow-up-bold" style="font-size: 70px;"></i>
+                                        <div><strong>사진 올리기</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            ( {{getImageLen}} / 6 )
+                        </div>
+                        <div v-if="getImageLen == 6" class="text-center"><button class="btn btn-outline-danger" @click="initImage">초기화</button></div>
+                    </div>
+                    <div class="text-center" v-if="getImageLen < 6">카메라가 없다면 가지고 계신 사진을 6장까지 넣어주세요!</div>
+                    <input ref="fileInput" @change="onImageUpload" type="file" style="display: none;" multiple>
                 </div>
-                <div v-if="Object.keys(images).length < 6" class="takePic d-flex justify-content-center align-items-center ml-auto mr-auto">
-                    <i class="mdi mdi-camera-outline" style="font-size: 30px;" @click="takePhoto"></i>
-                </div>
-                <div v-else class="text-center">
-                    <div class="text-center mb-2">다음 단계를 진행해주세요!</div>
-                    <div><button class="btn btn-outline-danger" @click="initImage">초기화</button></div>
-                </div>
-                
             </div>
             <div class="text-center">
                 <button class="btn btn-outline-primary mr-3" @click="$emit('on-previous')">이 전 단 계</button>
@@ -48,6 +78,7 @@ export default {
             images: {},
             boothWidth: null,
             boothHeight: null,
+            canPhoto: false,
             isCameraOpen: false,
             isPhotoTaken: false,
             isShotPhoto: false,
@@ -59,10 +90,17 @@ export default {
     },
     mounted() {
         this.images = this.$store.getters.getImages;
-        this.calcBoothSize();
+        // this.calcBoothSize();
         this.createCameraElement();
     },
+    beforeDestoyed() {
+        this.stopCameraStream();
+    },
     methods: {
+        info() {
+            console.log(Object.values(this.images)[1]);
+            console.log(this.images)
+        },
         calcBoothSize() {
             this.boothWidth = this.$refs.booth.clientWidth;
             this.boothHeight = (this.boothWidth * 3) / 4;
@@ -79,12 +117,12 @@ export default {
 
             navigator.mediaDevices.getUserMedia(constraints)
                 .then(stream => {
+                    this.canPhoto = true;
                     this.isLoading = false;
                     this.$refs.camera.srcObject = stream;
                 })
                 .catch(error => {
                     this.isLoading = false;
-                    alert("카메라 설정 중 에러발생");
             });
         },
 
@@ -106,8 +144,6 @@ export default {
                     this.isShotPhoto = false;
                 }, FLASH_TIMEOUT);
             }
-
-            // this.isPhotoTaken = !this.isPhotoTaken;
 
             const context = this.$refs.canvas.getContext('2d');
             
@@ -131,6 +167,39 @@ export default {
             this.$store.commit('setTargets', {});
             this.$store.commit('setUpdateQueue', []);
             this.images = {};
+        },
+
+        onUploadClick() {
+            console.log(this.images, 'upload');
+            this.$refs.fileInput.click();
+        },
+
+        async onImageUpload(e) {
+            if (this.getImageLen >= 6) return;
+
+            let files = Array.from(e.target.files)
+
+            for await (let file of files) {
+                let id = (new Date).getTime();
+
+                if (this.getImageLen >= 6) break;
+                this.$set(this.images, id, await this.readFile(file));
+            }
+        },
+
+        readFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    resolve(e.target.result);
+                }
+                reader.readAsDataURL(file);
+            })
+        },
+    },
+    computed: {
+        getImageLen() {
+            return Object.keys(this.images).length;
         }
     }
 }
@@ -147,6 +216,11 @@ export default {
     height: 50px;
     border-radius: 50%;
     box-shadow: 1px 1px 3px black;
+}
+
+.uploadImage {
+    width: 160px;
+    height: 120px;
 }
 
 video {

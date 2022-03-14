@@ -88,7 +88,7 @@ export default {
             colCnt: [],
             images: {},
             targetSticker: null,
-            targetColor: '#000000',
+            targetColor: '#00ff0000',
             frame: null,
             isMode: 'bg',
             isWork: false,
@@ -154,31 +154,35 @@ export default {
         this.frame = this.$store.getters.getFrame;
     },
     mounted() {
-        this.images = this.$store.getters.getTargets;
-        let table = this.$store.getters.getTable;
-        this.rows = table.rows;
-        this.columns = table.columns;
-        this.rowCnt = Array.from({length: table.rows}, (v, i) => i + 1);
-        this.colCnt = Array.from({length: table.columns}, (v, i) => i + 1);
-        this.sticker.cute_handdrawn = Array.from({length: 6}, (v, i) => i + 1);
-        this.sticker.cute_natural_doodle = Array.from({length: 12}, (v, i) => i + 1);
-        this.sticker.flower_leaf = Array.from({length: 38}, (v, i) => i + 1);
-
-        this.canvasHeight = this.$refs.canvas.clientHeight;
-        this.canvasWidth = this.$refs.canvas.clientWidth;
-        this.canvas = new fabric.Canvas(this.$refs.canvas);
-        this.canvas.setHeight(this.canvasHeight);
-        this.canvas.setWidth(this.canvasWidth);
-
-        if (this.$store.getters.getCanvas) {
-            this.canvas.loadFromJSON(this.$store.getters.getCanvas, this.canvas.renderAll.bind(this.canvas))        
-            this.setCanvasOption();
-        }
-
-        this.setEvent();
-        this.setWorkMode();
+        this.init();
     },
     methods: {
+        init() {
+            let table = this.$store.getters.getTable;
+
+            this.images = this.$store.getters.getTargets;
+            this.rows = table.rows;
+            this.columns = table.columns;
+            this.rowCnt = Array.from({length: table.rows}, (v, i) => i + 1);
+            this.colCnt = Array.from({length: table.columns}, (v, i) => i + 1);
+            this.sticker.cute_handdrawn = Array.from({length: 6}, (v, i) => i + 1);
+            this.sticker.cute_natural_doodle = Array.from({length: 12}, (v, i) => i + 1);
+            this.sticker.flower_leaf = Array.from({length: 38}, (v, i) => i + 1);
+
+            this.canvasHeight = this.$refs.canvas.clientHeight;
+            this.canvasWidth = this.$refs.canvas.clientWidth;
+            this.canvas = new fabric.Canvas(this.$refs.canvas);
+            this.canvas.setHeight(this.canvasHeight);
+            this.canvas.setWidth(this.canvasWidth);
+
+            if (this.$store.getters.getCanvas) {
+                this.canvas.loadFromJSON(this.$store.getters.getCanvas, this.canvas.renderAll.bind(this.canvas))        
+                this.setCanvasOption();
+            }
+
+            this.setEvent();
+            this.setWorkMode();
+        },
         setEvent() {
             this.canvas.on('mouse:down', (e) => {
                 console.log('this.isWork', this.isWork)
@@ -229,6 +233,9 @@ export default {
             }
         },
         saveWork() {
+            this.isWork = false;
+            this.selectBg(this.targetColor);
+            this.setWorkMode();
             this.$store.commit('setCanvas', JSON.stringify(this.canvas.toObject(['id'])));
             this.$store.commit('setPreviewImg', this.canvas.toDataURL({ format: 'image/png' }));
         },
@@ -284,23 +291,17 @@ export default {
         },
         setWorkMode() {
             if (this.isWork) {
-                this.canvas.backgroundColor = '#000000';
                 this.$refs.pic.style['z-index'] = 1;
                 this.$refs.deco.style['z-index'] = 2;
             } else {
-                this.canvas.backgroundColor = this.targetColor;
                 this.$refs.pic.style['z-index'] = 2;
                 this.$refs.deco.style['z-index'] = 1; 
             }
         },
         selectBg(color) {
-            if (this.targetColor == color) {
-                this.targetColor = '#000000';
-                this.canvas.backgroundColor = color;
-            } else {
-                this.targetColor = color;
-                this.canvas.backgroundColor = color;
-            }
+            console.log(color);
+            this.targetColor = color;
+            this.canvas.backgroundColor = color;
             
             this.canvas.renderAll();
         },
