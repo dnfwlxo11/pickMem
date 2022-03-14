@@ -7,11 +7,11 @@
         <dir class="row">
             <div class="col-8">
                 <div class="d-flex justify-content-center align-items-center">
-                    <div ref="pic" :class="`outter-frame-${parseInt(frame.split('x')[0])}-${parseInt(frame.split('x')[1])}`" style="position: absolute; padding: 20px;">
+                    <div ref="pic" :class="`outter-frame-${parseInt(frame.split('x')[0])}-${parseInt(frame.split('x')[1])}`" style="position: absolute; padding: 20px; padding-right: 0px;">
                         <div :class="`row p-0 m-0`" v-for="(row, rowIdx) of rowCnt" :key="rowIdx">
                             <div :class="`pl-0 pr-0 inner-frame inner-frame-${columns}-${rows}`" v-for="(col, colIdx) of colCnt" :key="colIdx">
                                 <div :class="`inner-frame-${columns}-${rows}`">
-                                    <img :src="images[rowIdx*colCnt.length + col]" :id="`canvas-${rowIdx*colCnt.length + col}`" :draggable="false">
+                                    <img :src="images[rowIdx*colCnt.length + col]" :id="`canvas-${rowIdx*colCnt.length + col}`" draggable="false">
                                 </div>
                             </div>
                         </div>
@@ -30,16 +30,22 @@
                 </div>
                 <span @click="isMode='bg'">배경색</span> | <span @click="isMode='sticker'">스티커</span> | <span @click="isMode='custom'">커스텀</span>
                 <hr>
-                <div v-if="isMode=='bg'">
-                    <div style="height: 450px;overflow-y: auto;">
+                <div v-if="isMode=='bg'"  style="height: 450px;overflow-y: auto;">
+                    <div v-for="(value, theme) in bg" :key="theme">
+                        <div class="mb-3"><strong>{{theme}} 테마</strong></div>
+                        <div class="row m-0 p-0 mb-3">
+                            <div :class="{ 'target': targetColor == color }" class="col-2 m-0 p-0 pt-1 pb-1" v-for="(color, idx) of value" :key="idx">
+                                <div class="bg m-auto" :style="{'background-color': color}" @click="selectBg(color)"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-else-if="isMode=='sticker'" style="height: 450px;overflow-y: auto;">
+                    <div class="mb-2">
                         <button :class="{'btn-primary': isText, 'btn-outline-primary': !isText}" class="btn mr-3" @click="isText=!isText">텍스트</button>
                         <input type="number" v-model="fontSize">
                     </div>
-                </div>
-                <div v-else-if="isMode=='sticker'">
-                    <div style="height: 450px;overflow-y: auto;">
-                        스티커
-                        <hr>
+                    <div>
                         <div v-for="(value, theme) in sticker" :key="theme">
                             <div class="mb-3"><strong>{{theme}} 테마</strong></div>
                             <div class="row m-0 p-0 mb-5">
@@ -82,6 +88,7 @@ export default {
             colCnt: [],
             images: {},
             targetSticker: null,
+            targetColor: '#000000',
             frame: null,
             isMode: 'bg',
             isWork: false,
@@ -96,6 +103,50 @@ export default {
                 'cute_handdrawn': [],
                 'cute_natural_doodle': [],
                 'flower_leaf': [],
+            },
+            bg: {
+                'simple': [
+                    '#F2F2F2',
+                    '#A6A6A6',
+                    '#595959',
+                    '#262626',
+                    '#0D0D0D',
+                ],
+                'modern': [
+                    '#131B26',
+                    '#D9B95B',
+                    '#D9C484',
+                    '#F2ECE4',
+                    '#D97D5B',
+                ],
+                'warm': [
+                    '#D9C077',
+                    '#F29F05',
+                    '#D97904',
+                    '#BF4904',
+                    '#F2F2F2',
+                ],
+                'astro': [
+                    '#F25E7A',
+                    '#4A2B8C',
+                    '#5155A6',
+                    '#05F2DB',
+                    '#F2E963',
+                ],
+                'cartoon': [
+                    '#636AF2',
+                    '#41A0F2',
+                    '#A2DCF2',
+                    '#04D98B',
+                    '#F2E205',  
+                ],
+                'ancient': [
+                    '#1D5948',
+                    '#F2BF5E',
+                    '#A6864B',
+                    '#F2D091',
+                    '#732509',   
+                ],
             }
         }
     },
@@ -233,12 +284,25 @@ export default {
         },
         setWorkMode() {
             if (this.isWork) {
+                this.canvas.backgroundColor = '#000000';
                 this.$refs.pic.style['z-index'] = 1;
                 this.$refs.deco.style['z-index'] = 2;
             } else {
+                this.canvas.backgroundColor = this.targetColor;
                 this.$refs.pic.style['z-index'] = 2;
                 this.$refs.deco.style['z-index'] = 1; 
             }
+        },
+        selectBg(color) {
+            if (this.targetColor == color) {
+                this.targetColor = '#000000';
+                this.canvas.backgroundColor = color;
+            } else {
+                this.targetColor = color;
+                this.canvas.backgroundColor = color;
+            }
+            
+            this.canvas.renderAll();
         },
     },
 }
@@ -246,7 +310,7 @@ export default {
 
 <style lang="scss" scoped>
 .frame {
-    height: 620px;
+    height: 630px;
 }
 
 img {
@@ -256,6 +320,11 @@ img {
     width: 100%;
 }
 
+.bg {
+    height: 40px;
+    width: 40px;
+}
+
 .sticker {
     object-fit: contain;
     height: 40px;
@@ -263,6 +332,8 @@ img {
 }
 
 .outter-frame {
+    padding-right: 0px;
+    padding-bottom: 0px;
     box-shadow: 0.5px 0.5px 1.5px black;
 
     &-1-1 {
