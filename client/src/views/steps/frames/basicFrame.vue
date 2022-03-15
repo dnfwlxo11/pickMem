@@ -22,11 +22,11 @@ export default {
     name: 'basicFrame',
     props: {
         rows: {
-            default: 1,
+            default: 2,
             type: Number,
         },
         columns: {
-            default: 4,
+            default: 1,
             type: Number,
         },
     },

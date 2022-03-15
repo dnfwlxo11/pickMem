@@ -1,5 +1,5 @@
 <template>
-    <div class="result-frame">
+    <div :class="`result-frame outter-frame-${columns}-${rows}`">
         <div :class="`outter-frame outter-frame-${columns}-${rows}`" ref='frame'>
             <div :class="`row p-0 m-0`" v-for="(row, rowIdx) of rowCnt" :key="rowIdx">
                 <div :class="`pl-0 pr-0 inner-frame inner-frame-${columns}-${rows}`" v-for="(col, colIdx) of colCnt" :key="colIdx">
@@ -18,6 +18,8 @@
 </template>
 
 <script>
+import { fabric } from 'fabric'
+
 export default {
     name: 'resultFrame',
     props: {
@@ -32,7 +34,8 @@ export default {
     },
     data() {
         return {
-            previewImg: null,
+            frameImg: null,
+            canvas: null,
             rowCnt: [],
             colCnt: [],
             images: {},
@@ -41,14 +44,29 @@ export default {
     created() {
     },
     mounted() {
-        if (this.$store.getters.getPreviewImg) {
-            this.previewImg = this.$store.getters.getPreviewImg;
-            this.$refs.frame.style.backgroundImage = `url(${this.previewImg})`
+        if (this.$store.getters.getFrameImg) {
+            this.frameImg = this.$store.getters.getFrameImg;
+            this.$refs.frame.style.backgroundImage = `url(${this.frameImg})`
         }
 
         this.images = this.$store.getters.getTargets;
         for (let i=1;i<=this.$props.rows;i++) this.rowCnt.push(i);
         for (let i=1;i<=this.$props.columns;i++) this.colCnt.push(i);
+
+        this.init();
+    },
+    methods: {
+        init() {
+            this.canvas = new fabric.Canvas(this.$refs.canvas);
+            this.canvas.setHeight(this.canvasHeight);
+            this.canvas.setWidth(this.canvasWidth);
+
+            if (this.$store.getters.getCanvas) {
+                this.canvas.loadFromJSON(this.$store.getters.getCanvas, this.canvas.renderAll.bind(this.canvas))        
+                // this.$refs.frame.style.backgroundImage = this.canvas.toDataURL({ format: 'image/png' });
+                this.canvas.renderAll();
+            }
+        },
     },
 }
 </script>
@@ -65,7 +83,10 @@ img {
     padding: 20px;
     padding-right: 0px;
     padding-bottom: 0px;
-    box-shadow: 0.5px 0.5px 1.5px black;
+    // border-style: solid;
+    // border-width: 0.5px 1.5px 1.5px 0.5px;
+    // border-color: black;
+    box-shadow: rgba(0, 0, 0, 1) 0.5px 0.5px 1.5px !important;
 
     &-1-1 {
         height: 350px;

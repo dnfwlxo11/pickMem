@@ -93,8 +93,8 @@ export default {
         this.images = this.$store.getters.getImages;
         this.createCameraElement();
     },
-    destroyed() {
-        // this.stopCameraStream();
+    beforeDestroyed() {
+        this.stopCameraStream();
     },
     methods: {
         createCameraElement() {

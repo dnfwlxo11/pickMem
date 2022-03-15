@@ -7,10 +7,11 @@ export default new Vuex.Store({
   state: {
     rows: 2,
     columns: 1,
-    workCanvas: null,
-    previewImg: null,
-    images: {},
+    frameCanvas: null,
+    frameImg: null,
     frame: null,
+    imgCanvas: {},
+    images: {},
     selectTarget: {},
     tmpTarget: {},
     removeQueue: [],
@@ -19,12 +20,13 @@ export default new Vuex.Store({
     setImages(state, imgObj) {
       state.images = imgObj;
     },
+    setImgCanvas(state, targetObj) {
+      Vue.set(state.imgCanvas, targetObj[0], targetObj[1])
+    },
     setTarget(state, targetObj) {
       Vue.set(state.selectTarget, targetObj[0], targetObj[1]);
     },
     setTmpTarget(state, targetObj) {
-      console.log(targetObj, 'targetObj')
-      console.log(state.tmpTarget, 'tmpTarget')
       Vue.set(state.tmpTarget, targetObj[0], targetObj[1]);
     },
     setTargets(state, targetObj) {
@@ -40,10 +42,10 @@ export default new Vuex.Store({
       state.frame = frame;
     },
     setCanvas(state, canvas) {
-      state.workCanvas = canvas;
+      state.frameCanvas = canvas;
     },
-    setPreviewImg(state, img) {
-      state.previewImg = img
+    setFrameImg(state, img) {
+      state.frameImg = img
     },
     setTable(state, table) {
       state.rows = table.rows;
@@ -67,10 +69,10 @@ export default new Vuex.Store({
       return state.frame;
     },
     getCanvas(state) {
-      return state.workCanvas;
+      return state.frameCanvas;
     },
-    getPreviewImg(state) {
-      return state.previewImg;
+    getFrameImg(state) {
+      return state.frameImg;
     },
     getTable(state) {
       return {
@@ -83,7 +85,10 @@ export default new Vuex.Store({
     },
     getTmpTarget: (state) => (idx) => {
       return state.tmpTarget[idx];
-    }
+    },
+    getImageCanvas: (state) => (idx) => {
+      return state.imgCanvas[idx];
+    },
   },
   actions: {
   },

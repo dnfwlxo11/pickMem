@@ -13,8 +13,7 @@
         <dir class="frame">
             <div class="row m-0 p-0">
                 <div class="col-8">
-                    <button class="btn btn-outline-danger mb-3" @click="initImg(currImg)">초기화</button>
-                    <canvas :class="`decoImg ${targetFilter}`" ref="canvas" width="600" height="450"></canvas>
+                    <canvas :class="`decoImg`" ref="canvas" width="600" height="450"></canvas>
                     <div class="text-center">
                         <span @click="prevImg"><i class="mdi mdi-arrow-left-bold" style="font-size: 50px;"></i></span>
                         <span style="font-size: 25px;">{{currImg}} / {{Object.keys(images).length}}</span>
@@ -76,7 +75,7 @@ export default {
             isMode: 'filter',
             isOpen: false,
             isSticker: false,
-            targetFilter: null,
+            targetFilter: 'normal',
             targetSticker: null,
             sticker: {
                 'cute_handdrawn': [],
@@ -108,21 +107,14 @@ export default {
             this.sticker.cute_natural_doodle = Array.from({length: 12}, (v, i) => i + 1);
             this.sticker.flower_leaf = Array.from({length: 38}, (v, i) => i + 1);
             this.canvas = new fabric.Canvas(this.$refs.canvas);
-            
-            if (this.$store.getters.getCanvas) {
-                this.canvas.loadFromJSON(this.$store.getters.getCanvas, this.canvas.renderAll.bind(this.canvas))        
-            }
 
-            const bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
-            this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
-                scaleX: this.canvas.width / bgImg.width,
-                scaleY: this.canvas.height / bgImg.height
-            })
+            this.loadImgCanvas();
 
             this.setFilterObj();
             this.setMouseEvent();
         },
         setFilterObj() {
+            this.$set(this.filters, 'normal', null);
             this.$set(this.filters, 'grayscale', new fabric.Image.filters.Grayscale({ grayscale: 0.5 }));
             this.$set(this.filters, 'invert', new fabric.Image.filters.Invert({ invert: 1 }));
             this.$set(this.filters, 'sepia', new fabric.Image.filters.Sepia({ sepia: 0.5 }));
@@ -139,6 +131,7 @@ export default {
             this.canvas.discardActiveObject().renderAll();
 
             this.$store.commit('setTarget', [this.currImg, this.canvas.toDataURL()]);
+            this.$store.commit('setImgCanvas', [this.currImg, JSON.stringify(this.canvas.toObject(['id']))])
         },
         setMouseEvent() {
             this.canvas.on('mouse:down', (e) => {
@@ -170,27 +163,36 @@ export default {
                 this.canvas.renderAll();
             }
         },
-        async prevImg() {
+        prevImg() {
             if (this.currImg == 1) return;
 
             this.currImg -= 1;
 
-            const bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
-            this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
-                scaleX: this.canvas.width / bgImg.width,
-                scaleY: this.canvas.height / bgImg.height
-            })
+            this.loadImgCanvas();
+            if (!this.canvas.backgroundImage.filters.length) this.targetFilter = 'normal';
+            else console.log(this.canvas.backgroundImage)
         },
-        async nextImg() {
+        nextImg() {
             if (this.currImg == Object.keys(this.images).length) return;
 
             this.currImg += 1;
 
-            const bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
-            this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
-                scaleX: this.canvas.width / bgImg.width,
-                scaleY: this.canvas.height / bgImg.height
-            })
+            this.loadImgCanvas();
+            if (!this.canvas.backgroundImage.filters.length) this.targetFilter = 'normal';
+            else console.log(this.canvas.backgroundImage)
+        },
+        async loadImgCanvas() {
+            if (this.$store.getters.getImageCanvas(this.currImg)) {
+                this.canvas.loadFromJSON(this.$store.getters.getImageCanvas(this.currImg), this.canvas.renderAll.bind(this.canvas));
+                console.log(this.canvas)
+                this.canvas.renderAll();
+            } else {
+                const bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
+                this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
+                    scaleX: this.canvas.width / bgImg.width,
+                    scaleY: this.canvas.height / bgImg.height
+                })
+            }
         },
         loadImgFromBase64(base64) {
             return new Promise((resolve, reject) => {
@@ -217,18 +219,44 @@ export default {
             else this.targetSticker = id;
         },
         async selectFilter(target) {
-            if (this.targetFilter == target) {
-                this.targetFilter = null;
-
+            if (this.targetFilter == target || target == 'normal') {
+                this.targetFilter = 'normal'
                 const bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
-                bgImg.filters.push(null)
+                bgImg.filters = []
                 bgImg.applyFilters();
                 this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
                     scaleX: this.canvas.width / bgImg.width,
                     scaleY: this.canvas.height / bgImg.height
                 })
             } else {
-                this.targetFilter = target;
+                this.targetFilter = target
+                const bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
+                bgImg.filters = [this.filters[this.targetFilter]];
+                bgImg.applyFilters();
+                this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
+                    scaleX: this.canvas.width / bgImg.width,
+                    scaleY: this.canvas.height / bgImg.height
+                })
+            }
+
+            // if (this.targetFilter == target || target == 'normal') {
+            //     this.targetFilter = 'normal';
+
+            //     // this.$set(this.images, this.currImg, this.$store.getters.getTmpTarget(this.currImg));
+            // } else {
+            //     this.targetFilter = target;
+
+            //     // bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
+            //     this.canvas.backgroundImage.filters.push(this.filters[target]);
+            //     this.canvas.backgroundImage.applyFilters();
+            // }
+
+            
+        },
+        async setFilter(image, filter) {
+            console.log(filter)
+            if (filter = 'normal') {
+                this.$set(this.images, this.currImg, this.$store.getters.getTmpTarget(this.currImg));
 
                 const bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
                 bgImg.filters.push(this.filters[this.targetFilter])
@@ -237,12 +265,11 @@ export default {
                     scaleX: this.canvas.width / bgImg.width,
                     scaleY: this.canvas.height / bgImg.height
                 })
+            } else {
+                const bgImg = await this.loadImgFromBase64(image);
+                bgImg.filters.push(filter);
+                bgImg.applyFilters();
             }
-        },
-        async setFilter(image, filter) {
-            const bgImg = await this.loadImgFromBase64(image);
-            bgImg.filters.push(filter);
-            bgImg.applyFilters();
 
             return bgImg.toDataURL();
         },

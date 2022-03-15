@@ -6,24 +6,22 @@
         </div>
         <div class="frame">
             <div class="mb-5">
-                <div ref="result">
+                <div ref="result" :class="`m-auto outter-frame outter-frame-${columns}-${rows}`">
                     <result-frame :rows="rows" :columns="columns"></result-frame>
                 </div>
             </div>
-
-            <div class="text-center">
-                <button class="btn btn-outline-primary mr-3" @click="$emit('on-previous')">이 전 단 계</button>
-                <button class="btn btn-outline-primary mr-3" @click="saveResult">저 장 하 기</button>
-                <button class="btn btn-outline-primary">공 유 하 기</button>
-            </div>
         </div>
-        
+        <div class="text-center">
+            <button class="btn btn-outline-primary mr-3" @click="$emit('on-previous')">이 전 단 계</button>
+            <button class="btn btn-outline-primary mr-3" @click="saveResult">저 장 하 기</button>
+            <button class="btn btn-outline-primary">공 유 하 기</button>
+        </div>
     </div>
 </template>
 
 <script>
 import resultFrame from './frames/resultFrame.vue';
-import html2convert from 'html2canvas';
+import html2canvas from 'html2canvas';
 
 export default {
     name: 'step-result',
@@ -36,7 +34,7 @@ export default {
             columns: 1,
         }
     },
-    mounted() {
+    created() {
         let table = this.$store.getters.getTable;
 
         this.rows = table.rows;
@@ -44,11 +42,11 @@ export default {
     },
     methods: {
         async saveResult() {
-            let result = await html2convert(this.$refs.result);
+            let result = await html2canvas(this.$refs.result);
 
             let a = document.createElement("a");
             a.href = result.toDataURL();
-            a.download = "Image.png";
+            a.download = "Image.jpg";
             a.click();
         },
     },
@@ -56,5 +54,52 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.frame {
+    height: 620px;
+}
 
+.outter-frame {
+    padding: 20px;
+
+    &-1-1 {
+        height: 390px;
+        width: 440px;
+    }
+    &-1-2 {
+        height: 560px;
+        width: 360px;
+    }
+    &-1-3 {
+        height: 565px;
+        width: 260px;
+    }
+    &-1-4 {
+        height: 600px;
+        width: 220px;
+    }
+    &-2-1 {
+        height: 360px;
+        width: 560px;
+    }
+    &-2-2 {
+        height: 560px;
+        width: 660px;
+    }
+    &-2-3 {
+        height: 565px;
+        width: 460px;
+    }
+    &-3-1 {
+        height: 260px;
+        width: 565px;
+    }
+    &-3-2 {
+        height: 460px;
+        width: 565px;
+    }
+    &-4-1 {
+        height: 220px;
+        width: 600px;
+    }
+}
 </style>

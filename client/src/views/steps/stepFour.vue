@@ -124,7 +124,7 @@ export default {
          window.removeEventListener('keydown', this.setKeydownEvent);
     },
     methods: {
-        init() {
+        async init() {
             let table = this.$store.getters.getTable;
 
             this.images = this.$store.getters.getTargets;
@@ -143,12 +143,21 @@ export default {
             this.canvas.setWidth(this.canvasWidth);
 
             if (this.$store.getters.getCanvas) {
-                this.canvas.loadFromJSON(this.$store.getters.getCanvas, this.canvas.renderAll.bind(this.canvas))        
+                await this.loadCanvasToJSON();
                 this.setCanvasOption();
+                console.log(this.canvas.backgroundColor, 'load')
+                this.targetColor = this.canvas.backgroundColor;
+                this.canvas.renderAll();
             }
 
             this.setMouseEvent();
             this.setWorkMode();
+        },
+        loadCanvasToJSON() {
+            return new Promise((resolve, reject) => {
+                this.canvas.loadFromJSON(this.$store.getters.getCanvas, this.canvas.renderAll.bind(this.canvas));
+                resolve();
+            })
         },
         setMouseEvent() {
             this.canvas.on('mouse:down', (e) => {
@@ -218,7 +227,8 @@ export default {
             this.selectBg(this.targetColor);
             this.setWorkMode();
             this.$store.commit('setCanvas', JSON.stringify(this.canvas.toObject(['id'])));
-            this.$store.commit('setPreviewImg', this.canvas.toDataURL({ format: 'image/png' }));
+            this.$store.commit('setFrameImg', this.canvas.toDataURL({ format: 'image/png' }));
+            console.log(this.canvas.backgroundColor, 'save')
         },
         setTextEvent(textBox) {
             textBox.setControlsVisibility({
@@ -282,7 +292,6 @@ export default {
             }
         },
         selectBg(color) {
-            console.log(color);
             this.targetColor = color;
             this.canvas.backgroundColor = color;
             
