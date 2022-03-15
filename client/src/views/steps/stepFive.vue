@@ -13,6 +13,7 @@
         <dir class="frame">
             <div class="row m-0 p-0">
                 <div class="col-8">
+                    <button class="btn btn-outline-danger mb-3" @click="initImg(currImg)">초기화</button>
                     <canvas :class="`decoImg ${targetFilter}`" ref="canvas" width="600" height="450"></canvas>
                     <div class="text-center">
                         <span @click="prevImg"><i class="mdi mdi-arrow-left-bold" style="font-size: 50px;"></i></span>
@@ -24,9 +25,10 @@
                     <span @click="isMode='filter'">필터</span> | <span @click="isMode='sticker'">스티커</span> | <span @click="isMode='draw'">그리기</span>
                     <hr>
                     <div v-if="isMode=='filter'">
+                        <input type="range" min="0.0" max="1.0" step="0.01" v-model="filterVal">
                         <div v-if="images[currImg]" class="row" style="height: 450px;overflow-y: auto;">
-                            <div :class="{ 'target': targetFilter == filter }" class="col-5 text-center mr-auto ml-auto mb-3 card" v-for="(filter, idx) of filters" :key="idx" @click="selectFilter(filter)">
-                                <img :class="`filterImg ${filter} mb-2`" :src="images[currImg]">
+                            <div :class="{ 'target': targetFilter == filter }" class="col-5 text-center mr-auto ml-auto mb-3 card" v-for="(obj, filter) in filters" :key="filter" @click="selectFilter(filter)">
+                                <img class="filterImg pt-1 mb-2 m-auto">
                                 <div>{{filter}}</div>
                             </div>
                         </div>
@@ -71,7 +73,7 @@ export default {
             rows: 2,
             columns: 1,
             images: {},
-            isMode: 'special',
+            isMode: 'filter',
             isOpen: false,
             isSticker: false,
             targetFilter: null,
@@ -81,16 +83,12 @@ export default {
                 'cute_natural_doodle': [],
                 'flower_leaf': [],
             },
-            filters: [
-                'blur',
-                'brightness',
-                'contrast',
-                'grayscale',
-                'huerotate',
-                'invert',
-                'saturate',
-                'sepia',
-            ]
+            filters: {
+                'normal': null, 'grayscale': null, 'invert': null, 'sepia': null, 'brownie': null,
+                'brightness': null, 'contrast': null, 'saturation': null, 'vibrance': null,
+                'vintage': null,'pixelate': null, 'blur': null, 
+            },
+            filterVal: 0.5,
         }
     },
     created() {
@@ -121,11 +119,26 @@ export default {
                 scaleY: this.canvas.height / bgImg.height
             })
 
+            this.setFilterObj();
             this.setMouseEvent();
         },
+        setFilterObj() {
+            this.$set(this.filters, 'grayscale', new fabric.Image.filters.Grayscale({ grayscale: 0.5 }));
+            this.$set(this.filters, 'invert', new fabric.Image.filters.Invert({ invert: 1 }));
+            this.$set(this.filters, 'sepia', new fabric.Image.filters.Sepia({ sepia: 0.5 }));
+            this.$set(this.filters, 'brownie', new fabric.Image.filters.Brownie({ brownie: 0.5 }));
+            this.$set(this.filters, 'brightness', new fabric.Image.filters.Brightness({ brightness: 0.5 }));
+            this.$set(this.filters, 'contrast', new fabric.Image.filters.Contrast({ contrast: 0.5 }));
+            this.$set(this.filters, 'saturation', new fabric.Image.filters.Saturation({ saturation: 0.5 }));
+            this.$set(this.filters, 'vibrance', new fabric.Image.filters.Vibrance({ vibrance: 0.5 }));
+            this.$set(this.filters, 'vintage', new fabric.Image.filters.Vintage({ vintage: 0.5 }));
+            this.$set(this.filters, 'pixelate', new fabric.Image.filters.Pixelate({ pixelate: 0.5 }));
+            this.$set(this.filters, 'blur', new fabric.Image.filters.Blur({ blur: 0.1 }));
+        },
         saveWork() {
-            // this.$store.commit('setCanvas', JSON.stringify(this.canvas.toObject(['id'])));
-            // this.$store.commit('setPreviewImg', this.canvas.toDataURL({ format: 'image/png' }));
+            this.canvas.discardActiveObject().renderAll();
+
+            this.$store.commit('setTarget', [this.currImg, this.canvas.toDataURL()]);
         },
         setMouseEvent() {
             this.canvas.on('mouse:down', (e) => {
@@ -203,10 +216,54 @@ export default {
             if (this.targetSticker == id) this.targetSticker = null;
             else this.targetSticker = id;
         },
-        selectFilter(target) {
-            if (this.targetFilter == target) this.targetFilter = null;
-            else this.targetFilter = target;
-        }
+        async selectFilter(target) {
+            if (this.targetFilter == target) {
+                this.targetFilter = null;
+
+                const bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
+                bgImg.filters.push(null)
+                bgImg.applyFilters();
+                this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
+                    scaleX: this.canvas.width / bgImg.width,
+                    scaleY: this.canvas.height / bgImg.height
+                })
+            } else {
+                this.targetFilter = target;
+
+                const bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
+                bgImg.filters.push(this.filters[this.targetFilter])
+                bgImg.applyFilters();
+                this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
+                    scaleX: this.canvas.width / bgImg.width,
+                    scaleY: this.canvas.height / bgImg.height
+                })
+            }
+        },
+        async setFilter(image, filter) {
+            const bgImg = await this.loadImgFromBase64(image);
+            bgImg.filters.push(filter);
+            bgImg.applyFilters();
+
+            return bgImg.toDataURL();
+        },
+        applyFilterVal() {
+            
+        },
+        async initImg(idx) {
+            this.$set(this.images, idx, this.$store.getters.getTmpTarget(idx));
+
+            this.canvas.getObjects().forEach(obj => {
+                this.canvas.remove(obj);
+            })
+
+            const bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
+            this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
+                scaleX: this.canvas.width / bgImg.width,
+                scaleY: this.canvas.height / bgImg.height
+            })
+
+            this.saveWork();
+        },
     },
 }
 </script>
@@ -236,13 +293,13 @@ export default {
     width: 40px;
 }
 
-.blur { filter: blur(1px); }
-.brightness { filter: brightness(0.50); }
-.contrast { filter: contrast(180%); }
-.grayscale { filter: grayscale(100%); }
-.huerotate { filter: hue-rotate(180deg); }
-.invert { filter: invert(100%); }
-.opacity { filter: opacity(50%); }
-.saturate { filter: saturate(7); }
-.sepia { filter: sepia(100%); }
+// .blur { filter: blur(1px); }
+// .brightness { filter: brightness(0.50); }
+// .contrast { filter: contrast(180%); }
+// .grayscale { filter: grayscale(100%); }
+// .huerotate { filter: hue-rotate(180deg); }
+// .invert { filter: invert(100%); }
+// .opacity { filter: opacity(50%); }
+// .saturate { filter: saturate(7); }
+// .sepia { filter: sepia(100%); }
 </style>

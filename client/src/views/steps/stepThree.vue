@@ -27,7 +27,6 @@
 </template>
 
 <script>
-
 import basicFrame from './frames/basicFrame.vue'
 
 export default {
@@ -59,17 +58,19 @@ export default {
                     let removeQueue = this.$store.getters.getRemoveQueues;
                     let recoverKey = removeQueue.shift();
 
-                    this.$store.commit('setUpdateQueue', removeQueue)
-                    this.$store.commit('setTarget', [recoverKey, src])
+                    this.$store.commit('setUpdateQueue', removeQueue);
+                    this.$store.commit('setTarget', [recoverKey, src]);
+                    this.$store.commit('setTmpTarget', [recoverKey, src]);
                 }
                 else {
                     this.$store.commit('setTarget', [Object.keys(this.selectTarget).length + 1, src]);
+                    this.$store.commit('setTmpTarget', [Object.keys(this.selectTarget).length + 1, src]);
                 }
                 this.selectTarget = this.$store.getters.getTargets;
             }
         },
         dragStart(e) {
-            e.dataTransfer.setData("text/plain", e.target.src)
+            e.dataTransfer.setData("text/plain", e.target.src);
         },
     },
 }

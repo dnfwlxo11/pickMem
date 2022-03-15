@@ -6,7 +6,13 @@
                 <hr>
             </div>
             <div class="picture mb-3">
-                <div v-if="!isLoading && canPhoto" class="text-center" ref="booth">
+                <div v-if="isLoading" style="font-size: 20px;height: 500px;">
+                    <div class="text-center">
+                        <div><i class="mdi mdi-loading mdi-spin"></i></div>
+                        <small>카메라 설정 중</small>
+                    </div>
+                </div>
+                <div v-else-if="!isLoading" class="text-center">
                     <div>
                         <video v-show="!isPhotoTaken" class="canvas" :width="600" :height="450" ref="camera" autoplay></video>
                         <canvas v-show="isPhotoTaken" id="photoTaken" class="canvas" :width="600" :height="450" ref="canvas"></canvas>
@@ -20,12 +26,6 @@
                     <div v-else class="text-center">
                         <div class="text-center mb-2">다음 단계를 진행해주세요!</div>
                         <div><button class="btn btn-outline-danger" @click="initImage">초기화</button></div>
-                    </div>
-                </div>
-                <div v-else-if="isLoading" style="font-size: 20px;height: 500px;">
-                    <div class="text-center">
-                        <div><i class="mdi mdi-loading mdi-spin"></i></div>
-                        <small>카메라 설정 중</small>
                     </div>
                 </div>
                 <div v-else class="m-auto" style="height: 450px; width: 600px;">
@@ -91,22 +91,12 @@ export default {
     },
     mounted() {
         this.images = this.$store.getters.getImages;
-        // this.calcBoothSize();
         this.createCameraElement();
     },
-    destoyed() {
-        this.stopCameraStream();
+    destroyed() {
+        // this.stopCameraStream();
     },
     methods: {
-        info() {
-            console.log(Object.values(this.images)[1]);
-            console.log(this.images)
-        },
-        calcBoothSize() {
-            this.boothWidth = this.$refs.booth.clientWidth;
-            this.boothHeight = (this.boothWidth * 3) / 4;
-        },
-
         createCameraElement() {
             this.isLoading = true;
 
@@ -115,11 +105,13 @@ export default {
                 video: true
             });
 
-
             navigator.mediaDevices.getUserMedia(constraints)
                 .then(stream => {
-                    this.canPhoto = true;
                     this.isLoading = false;
+
+                    return stream;
+                })
+                .then(stream => {
                     this.$refs.camera.srcObject = stream;
                 })
                 .catch(error => {
@@ -177,7 +169,6 @@ export default {
         },
 
         onUploadClick() {
-            console.log(this.images, 'upload');
             this.$refs.fileInput.click();
         },
 

@@ -12,6 +12,7 @@ export default new Vuex.Store({
     images: {},
     frame: null,
     selectTarget: {},
+    tmpTarget: {},
     removeQueue: [],
   },
   mutations: {
@@ -20,6 +21,11 @@ export default new Vuex.Store({
     },
     setTarget(state, targetObj) {
       Vue.set(state.selectTarget, targetObj[0], targetObj[1]);
+    },
+    setTmpTarget(state, targetObj) {
+      console.log(targetObj, 'targetObj')
+      console.log(state.tmpTarget, 'tmpTarget')
+      Vue.set(state.tmpTarget, targetObj[0], targetObj[1]);
     },
     setTargets(state, targetObj) {
       state.selectTarget = targetObj;
@@ -71,6 +77,12 @@ export default new Vuex.Store({
         rows: state.rows,
         columns: state.columns,
       }
+    },
+    getTmpTargets(state) {
+      return state.tmpTarget;
+    },
+    getTmpTarget: (state) => (idx) => {
+      return state.tmpTarget[idx];
     }
   },
   actions: {
