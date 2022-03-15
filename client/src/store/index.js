@@ -86,7 +86,7 @@ export default new Vuex.Store({
     getTmpTarget: (state) => (idx) => {
       return state.tmpTarget[idx];
     },
-    getImageCanvas: (state) => (idx) => {
+    getImgCanvas: (state) => (idx) => {
       return state.imgCanvas[idx];
     },
   },

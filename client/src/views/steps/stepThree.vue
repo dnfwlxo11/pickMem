@@ -12,7 +12,8 @@
                 이미지 리스트
                 <hr>
                 <div style="height: 550px;overflow-y: auto;">
-                    <div v-for="(value, id) in images" :key="id" @dragstart="dragStart" @dragleave.prevent @drop.prevent>
+                    <!-- <div v-for="(value, id) in images" :key="id" @dragstart="dragStart" @dragleave.prevent @drop.prevent> -->
+                    <div v-for="(value, id) in images" :key="id">
                         <img class="previewImg" :src="value" alt="" :id="`${id}`" @click="selectToClick(value)">
                         <hr>
                     </div>
@@ -50,10 +51,12 @@ export default {
             this.selectTarget = this.$store.getters.getTargets;
             let table = this.frame.split('x');
 
-            if (Object.keys(this.selectTarget).length > (parseInt(table[0]) * parseInt(table[1])) - 1) {
+            if (Object.keys(this.selectTarget).length == (parseInt(table[0]) * parseInt(table[1]))) {
                 console.log('이미 모두 골랐어요.')
                 return;
             } else {
+                let targetLen = Object.keys(this.selectTarget).length;
+
                 if (this.$store.getters.getRemoveQueueCnt) {
                     let removeQueue = this.$store.getters.getRemoveQueues;
                     let recoverKey = removeQueue.shift();
@@ -63,15 +66,16 @@ export default {
                     this.$store.commit('setTmpTarget', [recoverKey, src]);
                 }
                 else {
-                    this.$store.commit('setTarget', [Object.keys(this.selectTarget).length + 1, src]);
-                    this.$store.commit('setTmpTarget', [Object.keys(this.selectTarget).length + 1, src]);
+                    this.$store.commit('setTarget', [targetLen + 1, src]);
+                    this.$store.commit('setTmpTarget', [targetLen + 1, src]);
                 }
+
                 this.selectTarget = this.$store.getters.getTargets;
             }
         },
-        dragStart(e) {
-            e.dataTransfer.setData("text/plain", e.target.src);
-        },
+        // dragStart(e) {
+        //     e.dataTransfer.setData("text/plain", e.target.src);
+        // },
     },
 }
 </script>

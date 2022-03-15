@@ -113,6 +113,7 @@ export default {
             this.setFilterObj();
             this.setMouseEvent();
         },
+
         setFilterObj() {
             this.$set(this.filters, 'normal', null);
             this.$set(this.filters, 'grayscale', new fabric.Image.filters.Grayscale({ grayscale: 0.5 }));
@@ -127,12 +128,14 @@ export default {
             this.$set(this.filters, 'pixelate', new fabric.Image.filters.Pixelate({ pixelate: 0.5 }));
             this.$set(this.filters, 'blur', new fabric.Image.filters.Blur({ blur: 0.1 }));
         },
+
         saveWork() {
             this.canvas.discardActiveObject().renderAll();
 
             this.$store.commit('setTarget', [this.currImg, this.canvas.toDataURL()]);
             this.$store.commit('setImgCanvas', [this.currImg, JSON.stringify(this.canvas.toObject(['id']))])
         },
+
         setMouseEvent() {
             this.canvas.on('mouse:down', (e) => {
                 if (this.isSticker) {
@@ -150,6 +153,7 @@ export default {
                 if (e.selected.length > 1) this.canvas.discardActiveObject().renderAll();
             })
         },
+
         setKeydownEvent(e) {
             const allowKeys = [' ', 'DELETE']
             let pressKey = e.key.toUpperCase();
@@ -163,37 +167,63 @@ export default {
                 this.canvas.renderAll();
             }
         },
-        prevImg() {
+
+        async prevImg() {
             if (this.currImg == 1) return;
 
             this.currImg -= 1;
 
-            this.loadImgCanvas();
-            if (!this.canvas.backgroundImage.filters.length) this.targetFilter = 'normal';
-            else console.log(this.canvas.backgroundImage)
+            await this.loadImgCanvas(() => {
+                console.log('이전장')
+                if (!this.canvas.backgroundImage.filters.length) this.targetFilter = 'normal';
+                else {
+                    console.log(this.canvas.backgroundImage.filters[0].type)
+                    this.targetFilter = this.canvas.backgroundImage.filters[0].type.toLowerCase();
+                    console.log(this.targetFilter)
+                }
+            });            
         },
-        nextImg() {
+
+        async nextImg() {
             if (this.currImg == Object.keys(this.images).length) return;
 
             this.currImg += 1;
 
-            this.loadImgCanvas();
-            if (!this.canvas.backgroundImage.filters.length) this.targetFilter = 'normal';
-            else console.log(this.canvas.backgroundImage)
+            await this.loadImgCanvas(() => {
+                console.log('다음장')
+                if (!this.canvas.backgroundImage.filters.length) this.targetFilter = 'normal';
+                else {
+                    console.log(this.canvas.backgroundImage.filters[0].type)
+                    this.targetFilter = this.canvas.backgroundImage.filters[0].type.toLowerCase();
+                    console.log(this.targetFilter)
+                }
+            });
         },
+
         async loadImgCanvas() {
-            if (this.$store.getters.getImageCanvas(this.currImg)) {
-                this.canvas.loadFromJSON(this.$store.getters.getImageCanvas(this.currImg), this.canvas.renderAll.bind(this.canvas));
-                console.log(this.canvas)
+            if (this.$store.getters.getImgCanvas(this.currImg)) {
+                await this.loadCanvasToJSON();
                 this.canvas.renderAll();
             } else {
                 const bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
                 this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
                     scaleX: this.canvas.width / bgImg.width,
                     scaleY: this.canvas.height / bgImg.height
-                })
+                });
+                this.canvas.backgroundColor = '#FFFFFF';
+                this.canvas.renderAll();
+
+                this.$store.commit('setImgCanvas', this.currImg, this.canvas);
             }
         },
+
+        loadCanvasToJSON() {
+            return new Promise((resolve, reject) => {
+                this.canvas.loadFromJSON(this.$store.getters.getImgCanvas(this.currImg), this.canvas.renderAll.bind(this.canvas));
+                resolve();
+            })
+        },
+
         loadImgFromBase64(base64) {
             return new Promise((resolve, reject) => {
                 fabric.Image.fromURL(base64, (image) => {
@@ -201,6 +231,7 @@ export default {
                 })
             });
         },
+
         createObj(type, left, top) {
             if (type == 'sticker') {
                 let image = new fabric.Image(this.$refs[this.targetSticker][0], {
@@ -214,16 +245,17 @@ export default {
                 this.isSticker = false;
             }
         },
+
         selectSticker(id) {
             if (this.targetSticker == id) this.targetSticker = null;
             else this.targetSticker = id;
         },
+
         async selectFilter(target) {
             if (this.targetFilter == target || target == 'normal') {
                 this.targetFilter = 'normal'
-                const bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
-                bgImg.filters = []
-                bgImg.applyFilters();
+                console.log(this.$store.getters.getTmpTargets);
+                const bgImg = await this.loadImgFromBase64(this.$store.getters.getTmpTarget(this.currImg));
                 this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
                     scaleX: this.canvas.width / bgImg.width,
                     scaleY: this.canvas.height / bgImg.height
@@ -238,44 +270,12 @@ export default {
                     scaleY: this.canvas.height / bgImg.height
                 })
             }
-
-            // if (this.targetFilter == target || target == 'normal') {
-            //     this.targetFilter = 'normal';
-
-            //     // this.$set(this.images, this.currImg, this.$store.getters.getTmpTarget(this.currImg));
-            // } else {
-            //     this.targetFilter = target;
-
-            //     // bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
-            //     this.canvas.backgroundImage.filters.push(this.filters[target]);
-            //     this.canvas.backgroundImage.applyFilters();
-            // }
-
-            
         },
-        async setFilter(image, filter) {
-            console.log(filter)
-            if (filter = 'normal') {
-                this.$set(this.images, this.currImg, this.$store.getters.getTmpTarget(this.currImg));
 
-                const bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
-                bgImg.filters.push(this.filters[this.targetFilter])
-                bgImg.applyFilters();
-                this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
-                    scaleX: this.canvas.width / bgImg.width,
-                    scaleY: this.canvas.height / bgImg.height
-                })
-            } else {
-                const bgImg = await this.loadImgFromBase64(image);
-                bgImg.filters.push(filter);
-                bgImg.applyFilters();
-            }
-
-            return bgImg.toDataURL();
-        },
         applyFilterVal() {
             
         },
+
         async initImg(idx) {
             this.$set(this.images, idx, this.$store.getters.getTmpTarget(idx));
 

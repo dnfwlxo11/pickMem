@@ -4,10 +4,7 @@
             <div :class="`row p-0 m-0`" v-for="(row, rowIdx) of rowCnt" :key="rowIdx">
                 <div :class="`pl-0 pr-0 inner-frame inner-frame-${columns}-${rows}`" v-for="(col, colIdx) of colCnt" :key="colIdx">
                     <div :class="`inner-frame-${columns}-${rows}`">
-                        <div v-if="!images[rowIdx*colCnt.length + col]" :class="`inner-frame-${columns}-${rows}`">
-                            <canvas :id="`canvas-${rowIdx*colCnt.length + col}`"></canvas>
-                        </div>
-                        <div v-else :class="`inner-frame-${columns}-${rows}`">
+                        <div :class="`inner-frame-${columns}-${rows}`">
                             <img :src="images[rowIdx*colCnt.length + col]" :id="`canvas-${rowIdx*colCnt.length + col}`" draggable="false">
                         </div>
                     </div>
@@ -18,8 +15,6 @@
 </template>
 
 <script>
-import { fabric } from 'fabric'
-
 export default {
     name: 'resultFrame',
     props: {
@@ -52,21 +47,8 @@ export default {
         this.images = this.$store.getters.getTargets;
         for (let i=1;i<=this.$props.rows;i++) this.rowCnt.push(i);
         for (let i=1;i<=this.$props.columns;i++) this.colCnt.push(i);
-
-        this.init();
     },
     methods: {
-        init() {
-            this.canvas = new fabric.Canvas(this.$refs.canvas);
-            this.canvas.setHeight(this.canvasHeight);
-            this.canvas.setWidth(this.canvasWidth);
-
-            if (this.$store.getters.getCanvas) {
-                this.canvas.loadFromJSON(this.$store.getters.getCanvas, this.canvas.renderAll.bind(this.canvas))        
-                // this.$refs.frame.style.backgroundImage = this.canvas.toDataURL({ format: 'image/png' });
-                this.canvas.renderAll();
-            }
-        },
     },
 }
 </script>
@@ -77,16 +59,19 @@ img {
     object-fit: cover;
     height: 100%;
     width: 100%;
+    background: #FFF;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    border-color: grey;
 }
 
 .outter-frame {
-    padding: 20px;
+    padding: 19px;
     padding-right: 0px;
     padding-bottom: 0px;
-    // border-style: solid;
-    // border-width: 0.5px 1.5px 1.5px 0.5px;
-    // border-color: black;
-    box-shadow: rgba(0, 0, 0, 1) 0.5px 0.5px 1.5px !important;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    border-color: grey;
 
     &-1-1 {
         height: 350px;
@@ -131,11 +116,9 @@ img {
 }
 
 .inner-frame {
-    position: relative;
     margin-bottom: 20px;
     margin-right: 20px;
-    background: #FFF;
-    box-shadow: 0.5px 0.5px 1.5px black;
+    background-color: #FFF;
 
     &-1-1 {
         height: 270px;
@@ -177,16 +160,5 @@ img {
         height: 140px;
         width: 105px;
     }
-}
-
-.overlay {
-    position: absolute;
-    font-size: 30px;
-    top: 0%;
-    left: 0%;
-}
-
-.booth {
-    position: relative;
 }
 </style>

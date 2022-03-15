@@ -32,7 +32,7 @@ export default {
     },
     data() {
         return {
-            previewImg: null,
+            frameImg: null,
             rowCnt: [],
             colCnt: [],
             images: {},
@@ -41,9 +41,9 @@ export default {
     created() {
     },
     mounted() {
-        if (this.$store.getters.getPreviewImg) {
-            this.previewImg = this.$store.getters.getPreviewImg;
-            this.$refs.frame.style.backgroundImage = `url(${this.previewImg})`
+        if (this.$store.getters.getFrameImg) {
+            this.frameImg = this.$store.getters.getFrameImg;
+            this.$refs.frame.style.backgroundImage = `url(${this.frameImg})`
         }
 
         this.images = this.$store.getters.getTargets;

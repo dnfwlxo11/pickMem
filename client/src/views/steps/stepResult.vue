@@ -43,10 +43,13 @@ export default {
     methods: {
         async saveResult() {
             let result = await html2canvas(this.$refs.result);
+            result.style.backgroundColor = '#FFFFFF'
+
+            console.log(result.style.backgroundColor)
 
             let a = document.createElement("a");
             a.href = result.toDataURL();
-            a.download = "Image.jpg";
+            a.download = "Image.png";
             a.click();
         },
     },

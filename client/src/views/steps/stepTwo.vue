@@ -12,7 +12,7 @@
                         <small>카메라 설정 중</small>
                     </div>
                 </div>
-                <div v-else-if="!isLoading" class="text-center">
+                <div v-else-if="!isLoading && canPhoto" class="text-center">
                     <div>
                         <video v-show="!isPhotoTaken" class="canvas" :width="600" :height="450" ref="camera" autoplay></video>
                         <canvas v-show="isPhotoTaken" id="photoTaken" class="canvas" :width="600" :height="450" ref="canvas"></canvas>
@@ -108,6 +108,7 @@ export default {
             navigator.mediaDevices.getUserMedia(constraints)
                 .then(stream => {
                     this.isLoading = false;
+                    this.canPhoto = true;
 
                     return stream;
                 })
@@ -116,6 +117,7 @@ export default {
                 })
                 .catch(error => {
                     this.isLoading = false;
+                    this.canPhoto = false;
             });
         },
 
