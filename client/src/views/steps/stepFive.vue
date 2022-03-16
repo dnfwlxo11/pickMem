@@ -108,7 +108,8 @@ export default {
             this.sticker.flower_leaf = Array.from({length: 38}, (v, i) => i + 1);
             this.canvas = new fabric.Canvas(this.$refs.canvas);
 
-            this.loadImgCanvas();
+            await this.loadImgCanvas();
+            // this.targetFilter = this.canvas.backgroundImage.filters[0].type.toLowerCase();
 
             this.setFilterObj();
             this.setMouseEvent();
@@ -173,15 +174,7 @@ export default {
 
             this.currImg -= 1;
 
-            await this.loadImgCanvas(() => {
-                console.log('이전장')
-                if (!this.canvas.backgroundImage.filters.length) this.targetFilter = 'normal';
-                else {
-                    console.log(this.canvas.backgroundImage.filters[0].type)
-                    this.targetFilter = this.canvas.backgroundImage.filters[0].type.toLowerCase();
-                    console.log(this.targetFilter)
-                }
-            });            
+            await this.loadImgCanvas();            
         },
 
         async nextImg() {
@@ -189,39 +182,40 @@ export default {
 
             this.currImg += 1;
 
-            await this.loadImgCanvas(() => {
-                console.log('다음장')
-                if (!this.canvas.backgroundImage.filters.length) this.targetFilter = 'normal';
-                else {
-                    console.log(this.canvas.backgroundImage.filters[0].type)
-                    this.targetFilter = this.canvas.backgroundImage.filters[0].type.toLowerCase();
-                    console.log(this.targetFilter)
-                }
-            });
+            await this.loadImgCanvas();
         },
 
         async loadImgCanvas() {
             if (this.$store.getters.getImgCanvas(this.currImg)) {
-                await this.loadCanvasToJSON();
-                this.canvas.renderAll();
+                let json = this.$store.getters.getImgCanvas(this.currImg)
+                
+                await this.loadCanvasToJSON(json);
+                
+                let backgroundImgObj = this.canvas.backgroundImage;
+
+                if (backgroundImgObj.filters.length) this.targetFilter = backgroundImgObj.filters[0].type.toLowerCase();    
+                else this.targetFilter = 'normal';
             } else {
-                const bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
+                const bgImg = await this.loadImgFromBase64(this.$store.getters.getTmpTarget(this.currImg));
                 this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
                     scaleX: this.canvas.width / bgImg.width,
                     scaleY: this.canvas.height / bgImg.height
                 });
+
                 this.canvas.backgroundColor = '#FFFFFF';
                 this.canvas.renderAll();
 
-                this.$store.commit('setImgCanvas', this.currImg, this.canvas);
-            }
+                this.$store.commit('setImgCanvas', [this.currImg, JSON.stringify(this.canvas.toObject(['id']))]);
+            }            
         },
 
-        loadCanvasToJSON() {
+        loadCanvasToJSON(json) {
             return new Promise((resolve, reject) => {
-                this.canvas.loadFromJSON(this.$store.getters.getImgCanvas(this.currImg), this.canvas.renderAll.bind(this.canvas));
-                resolve();
-            })
+                this.canvas.loadFromJSON(json, () => {
+                    this.canvas.renderAll.bind(this.canvas);
+                    resolve(true);    
+                });
+            });
         },
 
         loadImgFromBase64(base64) {
@@ -254,7 +248,6 @@ export default {
         async selectFilter(target) {
             if (this.targetFilter == target || target == 'normal') {
                 this.targetFilter = 'normal'
-                console.log(this.$store.getters.getTmpTargets);
                 const bgImg = await this.loadImgFromBase64(this.$store.getters.getTmpTarget(this.currImg));
                 this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
                     scaleX: this.canvas.width / bgImg.width,
@@ -270,6 +263,8 @@ export default {
                     scaleY: this.canvas.height / bgImg.height
                 })
             }
+
+            this.$store.commit('setImgCanvas', [this.currImg, JSON.stringify(this.canvas.toObject(['id']))]);
         },
 
         applyFilterVal() {

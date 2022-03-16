@@ -1,6 +1,6 @@
 <template>
     <div :class="`result-frame outter-frame-${columns}-${rows}`">
-        <div :class="`outter-frame outter-frame-${columns}-${rows}`" ref='frame'>
+        <div :class="`outter-frame outter-frame-${columns}-${rows}`" ref='frame' style="">
             <div :class="`row p-0 m-0`" v-for="(row, rowIdx) of rowCnt" :key="rowIdx">
                 <div :class="`pl-0 pr-0 inner-frame inner-frame-${columns}-${rows}`" v-for="(col, colIdx) of colCnt" :key="colIdx">
                     <div :class="`inner-frame-${columns}-${rows}`">
@@ -60,6 +60,9 @@ img {
     height: 100%;
     width: 100%;
     background: #FFF;
+
+    // box-shadow: 0.5px 0.5px 1.5px black;
+
     border-style: solid;
     border-width: 0 1px 1px 0;
     border-color: grey;
@@ -69,6 +72,9 @@ img {
     padding: 19px;
     padding-right: 0px;
     padding-bottom: 0px;
+
+    // box-shadow: 0.5px 0.5px 1.5px black;
+
     border-style: solid;
     border-width: 0 1px 1px 0;
     border-color: grey;

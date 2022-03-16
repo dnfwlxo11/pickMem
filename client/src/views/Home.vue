@@ -24,8 +24,5 @@ export default {
 <style>
 .layout {
   padding: 30px;
-  width: 1200px;
-  height: 800px;
-  box-shadow: 0.5px 0.5px 1.5px black;
 }
 </style>
