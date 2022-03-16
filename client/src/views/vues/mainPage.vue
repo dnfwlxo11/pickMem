@@ -18,10 +18,6 @@ export default {
 </script>
 
 <style scoped>
-.main-page {
-    height: 800px;
-}
-
 .title {
     font-size: 25px;
 }

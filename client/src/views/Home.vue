@@ -1,11 +1,7 @@
 <template>
-  <div class="home">
-    <div class="container mt-5 mb-5">
-      <div class="layout m-auto">
-        <div>
-          <main-page></main-page>
-        </div>
-      </div>
+  <div class="home h-100">
+    <div class="container h-100">
+      <main-page class="h-100"></main-page>
     </div>
   </div>
 </template>

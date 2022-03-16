@@ -1,28 +1,16 @@
 <template>
     <div class="step-three">
-        <div style="font-size: 20px;">
-            <strong>Step 3. 사진 고르기</strong>
-            <hr>
-        </div>
         <div class="row mb-3">
-            <div class="col-8 frame d-flex">
-                <basic-frame v-if="frame" class="m-auto" :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></basic-frame>
-            </div>
-            <div class="col-4">
-                이미지 리스트
-                <hr>
-                <div style="height: 550px;overflow-y: auto;">
-                    <!-- <div v-for="(value, id) in images" :key="id" @dragstart="dragStart" @dragleave.prevent @drop.prevent> -->
-                    <div v-for="(value, id) in images" :key="id">
-                        <img class="previewImg" :src="value" alt="" :id="`${id}`" @click="selectToClick(value)">
-                        <hr>
-                    </div>
+            <basic-frame v-if="frame" class="m-auto" :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></basic-frame>
+        </div>
+        <div class="row">
+            이미지 리스트
+            <hr>
+            <div style="verticalScroll" ref="vertical">
+                <div class="images mr-3" v-for="(value, id) in images" :key="id">
+                    <img class="previewImg" :src="value" alt="" :id="`${id}`" @click="selectToClick(value)" draggable="false">
                 </div>
             </div>
-        </div>
-        <div class="text-center">
-            <button class="btn btn-outline-primary mr-3" @click="$emit('on-previous')">이 전 단 계</button>
-            <button class="btn btn-outline-primary" @click="$emit('on-next')">다 음 단 계</button>
         </div>
     </div>
 </template>
@@ -37,12 +25,14 @@ export default {
     },
     data() {
         return {
+            width: 500,
             images: {},
             selectTarget: {},
             frame: null,
         }
     },
     mounted() {
+        this.$refs.vertical.style.width = this.width;
         this.images = this.$store.getters.getImages;
         this.frame = this.$store.getters.getFrame;
     },
@@ -81,12 +71,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.frame {
-    height: 620px;
-}
-
 .previewImg {
     height: 140px;
     width: 200px;
+}
+
+.verticalScroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+
+.images {
+    float: left;
 }
 </style>

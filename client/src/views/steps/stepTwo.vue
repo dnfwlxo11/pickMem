@@ -1,11 +1,7 @@
 <template>
     <div class="step-one">
         <div>
-            <div style="font-size: 20px;">
-                <strong>Step 2. 사진 촬영</strong>
-                <hr>
-            </div>
-            <div class="picture mb-3">
+            <div class="mb-3">
                 <div v-if="isLoading" style="font-size: 20px;height: 500px;">
                     <div class="text-center">
                         <div><i class="mdi mdi-loading mdi-spin"></i></div>
@@ -59,10 +55,6 @@
                     <input ref="fileInput" @change="onImageUpload" type="file" style="display: none;" multiple>
                 </div>
             </div>
-            <div class="text-center">
-                <button class="btn btn-outline-primary mr-3" @click="$emit('on-previous')">이 전 단 계</button>
-                <button class="btn btn-outline-primary" @click="showingImage();$emit('on-next')">다 음 단 계</button>
-            </div>
         </div>
     </div>
 </template>
@@ -93,7 +85,8 @@ export default {
         this.images = this.$store.getters.getImages;
         this.createCameraElement();
     },
-    beforeDestroyed() {
+    beforeDestroy() {
+        this.showingImage();
         this.stopCameraStream();
     },
     methods: {
@@ -206,11 +199,6 @@ export default {
 </script>
 
 <style scoped>
-.picture {
-    height: 620px;
-    /* box-shadow: 0.5px 0.5px 1.5px black; */
-}
-
 .takePic {
     width: 50px;
     height: 50px;
