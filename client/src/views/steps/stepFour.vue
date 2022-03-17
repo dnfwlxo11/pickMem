@@ -48,7 +48,7 @@
                             <div class="mb-3"><strong>{{theme}} 테마</strong></div>
                             <div class="row m-0 p-0 mb-5">
                                 <div :id="`${theme}_${item}`" :class="{ 'target': targetSticker == `${theme}_${item}` }" class="col-3 mb-3 text-center" v-for="(item, idx) of value" :key="idx" @click="isSticker=!isSticker;selectSticker(`${theme}_${item}`)">
-                                    <img :ref="`${theme}_${item}`" class="sticker" :src="`/stickers/${theme}_${item}.png`">
+                                    <img :ref="`${theme}_${item}`" class="sticker" :src="require(`@/assets/stickers/${theme}_${item}.png`)">
                                 </div>
                             </div>
                         </div>
@@ -209,7 +209,7 @@ export default {
                 let image = new fabric.Image(this.$refs[this.targetSticker][0], {
                     left: left,
                     top: top
-                });
+                }, { crossOrigin: 'anonymous'});
                 
                 this.canvas.add(image);
                 this.canvas.renderAll();

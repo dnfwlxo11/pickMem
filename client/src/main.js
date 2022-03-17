@@ -4,6 +4,9 @@ import router from './router'
 import store from './store'
 import plugins from './plugins'
 
+import '@/assets/css/bootstrap.min.css';
+import '@/assets/css/materialdesignicons.min.css';
+
 Vue.config.productionTip = false
 Vue.use(plugins);
 

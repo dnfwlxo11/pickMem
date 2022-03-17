@@ -7,8 +7,8 @@
         <div class="row m-0 p-0">
             <div class="col-8">
                 <div class="d-flex justify-content-center align-items-center">
-                    <canvas v-if="rows <= columns" :class="`decoImg`" ref="canvas" :width="600" :height="450"></canvas>
-                    <canvas :class="`decoImg`" ref="canvas" :width="450" :height="600"></canvas>
+                    <canvas v-if="rows <= columns" :class="`decoImg`" ref="canvas" :width="450" :height="600"></canvas>
+                    <canvas v-else :class="`decoImg`" ref="canvas" :width="600" :height="450"></canvas>
                 </div>
                 <div class="text-center">
                     <span @click="prevImg"><i class="mdi mdi-arrow-left-bold" style="font-size: 50px;"></i></span>
@@ -33,7 +33,7 @@
                         <div class="mb-3"><strong>{{theme}} 테마</strong></div>
                         <div class="row m-0 p-0 mb-5">
                             <div :id="`${theme}_${item}`" :class="{ 'target': targetSticker == `${theme}_${item}` }" class="col-3 mb-3 text-center" v-for="(item, idx) of value" :key="idx" @click="isSticker=!isSticker;selectSticker(`${theme}_${item}`)">
-                                <img :ref="`${theme}_${item}`" class="sticker" :src="`/stickers/${theme}_${item}.png`">
+                                <img :ref="`${theme}_${item}`" class="sticker" :src="require(`@/assets/stickers/${theme}_${item}.png`)">
                             </div>
                         </div>
                     </div>
@@ -216,7 +216,7 @@ export default {
             return new Promise((resolve, reject) => {
                 fabric.Image.fromURL(base64, (image) => {
                     resolve(image);
-                })
+                }, { crossOrigin: 'anonymous'})
             });
         },
 
@@ -285,10 +285,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.frame {
-    height: 620px;
-}
-
 .decoImg {
     box-shadow: 0.5px 0.5px 1.5px black;
     background-color: #FFF;
