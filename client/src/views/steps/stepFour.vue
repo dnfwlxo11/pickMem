@@ -1,19 +1,13 @@
     <template>
     <div class="step-four">
-        <div style="font-size: 20px;">
-            <div class="row m-0 p-0 w-100">
-                <div class="col-6 p-0 m-0 text-left"><strong>Step 4. 프레임 꾸미기</strong></div>
-                <div class="col-6 p-0 m-0 text-right">
-                    <button class="btn btn-outline-primary mr-2" @click="saveWork">저장</button>
-                    <button class="btn btn-outline-primary mr-2" @click="isWork=!isWork;setWorkMode()">{{isWork ? "수정" : "관전" }}</button>
-                    <button class="btn btn-outline-primary" @click="isOpen=true">미리보기</button>
-                </div>
-            </div>
-            <hr>
+        <div class="text-center mb-3">
+            <button class="btn btn-outline-primary mr-2" @click="saveWork">저장</button>
+            <button class="btn btn-outline-primary mr-2" @click="isWork=!isWork;setWorkMode()">{{isWork ? "수정" : "관전" }}</button>
+            <button class="btn btn-outline-primary" @click="isOpen=true">미리보기</button>
         </div>
-        <dir class="row">
-            <div class="col-8">
-                <div class="d-flex justify-content-center align-items-center">
+        <div class="row m-0 p-0 mb-5">
+            <div class="col-md-8 m-auto">
+                <div class="mb-3 d-flex justify-content-center">
                     <div ref="pic" :class="`outter-frame-${parseInt(frame.split('x')[0])}-${parseInt(frame.split('x')[1])}`" style="position: absolute; padding: 20px; padding-right: 0px;">
                         <div :class="`row p-0 m-0`" v-for="(row, rowIdx) of rowCnt" :key="rowIdx">
                             <div :class="`pl-0 pr-0 inner-frame inner-frame-${columns}-${rows}`" v-for="(col, colIdx) of colCnt" :key="colIdx">
@@ -27,12 +21,14 @@
                         <canvas v-if="frame" :class="`outter-frame outter-frame-${parseInt(frame.split('x')[0])}-${parseInt(frame.split('x')[1])}`" ref="canvas"></canvas>
                     </div>
                 </div>
-                <div class="text-center"><small>실제 효과들은 사진 뒤에 표시됩니다. <br> 미리보기 모드를 통해 확인할 수 있습니다.</small></div>
+                <div class="text-center">
+                    <small>실제 효과들은 사진 뒤에 표시됩니다. <br> 미리보기 모드를 통해 확인할 수 있습니다.</small>
+                </div>
             </div>
-            <div class="col-4">
+            <div class="col-md-4">
                 <span @click="isMode='bg'">배경색</span> | <span @click="isMode='sticker'">스티커</span>
                 <hr>
-                <div v-if="isMode=='bg'"  style="height: 450px;overflow-y: auto;">
+                <div v-if="isMode=='bg'"  style="height: 400px;overflow-y: auto;">
                     <div v-for="(value, theme) in bg" :key="theme">
                         <div class="mb-3"><strong>{{theme}} 테마</strong></div>
                         <div class="row m-0 p-0 mb-3">
@@ -59,10 +55,6 @@
                     </div>
                 </div>
             </div>
-        </dir>
-        <div class="text-center">
-            <button class="btn btn-outline-primary mr-3" @click="$emit('on-previous')">이 전 단 계</button>
-            <button class="btn btn-outline-primary" @click="saveWork();$emit('on-next')">다 음 단 계</button>
         </div>
         <preview-modal v-if="isOpen" @on-close="isOpen=false" :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></preview-modal>
     </div>
@@ -120,8 +112,11 @@ export default {
         this.init();
         window.addEventListener('keydown', this.setKeydownEvent);
     },
+    beforeDestroy() {
+        this.saveWork();
+    },
     destroyed() {
-         window.removeEventListener('keydown', this.setKeydownEvent);
+        window.removeEventListener('keydown', this.setKeydownEvent);
     },
     methods: {
         async init() {
@@ -224,11 +219,11 @@ export default {
         },
         saveWork() {
             this.isWork = false;
+            this.targetSticker = null,
             this.selectBg(this.targetColor);
             this.setWorkMode();
             this.$store.commit('setCanvas', JSON.stringify(this.canvas.toObject(['id'])));
             this.$store.commit('setFrameImg', this.canvas.toDataURL({ format: 'image/png' }));
-            console.log(this.canvas.backgroundColor, 'save')
         },
         setTextEvent(textBox) {
             textBox.setControlsVisibility({

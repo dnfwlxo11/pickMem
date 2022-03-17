@@ -1,14 +1,8 @@
 <template>
     <div class="step-five">
-        <div style="font-size: 20px;">
-            <div class="row m-0 p-0 w-100">
-                <div class="col-6 p-0 m-0 text-left"><strong>Step 5. 사진 꾸미기</strong></div>
-                <div class="col-6 p-0 m-0 text-right">
-                    <button class="btn btn-outline-primary mr-2" @click="saveWork">저장</button>
-                    <button class="btn btn-outline-primary" @click="isOpen=true">미리보기</button>
-                </div>
-            </div>
-            <hr>
+        <div class="text-center mb-3">
+            <button class="btn btn-outline-primary mr-2" @click="saveWork">저장</button>
+            <button class="btn btn-outline-primary" @click="isOpen=true">미리보기</button>
         </div>
         <dir class="frame">
             <div class="row m-0 p-0">
@@ -45,11 +39,6 @@
                 </div>
             </div>
         </dir>
-        <div class="text-center">
-            <button class="btn btn-outline-primary mr-3" @click="$emit('on-previous')">이 전 단 계</button>
-            <button class="btn btn-outline-primary" @click="$emit('on-next')">다 음 단 계</button>
-        </div>
-        <img ref="hiddenImg">
         <preview-modal v-if="isOpen" @on-close="isOpen=false" :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></preview-modal>
     </div>
 </template>
@@ -109,7 +98,6 @@ export default {
             this.canvas = new fabric.Canvas(this.$refs.canvas);
 
             await this.loadImgCanvas();
-            // this.targetFilter = this.canvas.backgroundImage.filters[0].type.toLowerCase();
 
             this.setFilterObj();
             this.setMouseEvent();

@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    canNext: false,
     rows: 2,
     columns: 1,
     frameCanvas: null,
@@ -17,6 +18,9 @@ export default new Vuex.Store({
     removeQueue: [],
   },
   mutations: {
+    setNext(state, val) {
+      state.canNext = val;
+    },
     setImages(state, imgObj) {
       state.images = imgObj;
     },
@@ -31,6 +35,9 @@ export default new Vuex.Store({
     },
     setTargets(state, targetObj) {
       state.selectTarget = targetObj;
+    },
+    setTmpTargets(state, targetObj) {
+      state.tmpTarget = targetObj;
     },
     setRemoveQueue(state, target) {
       state.removeQueue.push(target);
@@ -53,6 +60,9 @@ export default new Vuex.Store({
     }
   },
   getters: {
+    getNext(state) {
+      return state.canNext;
+    },
     getImages(state) {
       return state.images;
     },

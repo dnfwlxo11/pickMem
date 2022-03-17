@@ -1,8 +1,8 @@
 <template>
     <div class="footer">
-        <div class="w-100 h-100">
+        <div class="w-100">
             <hr>
-            <div class="title m-auto"><strong>{{msg}}</strong></div>
+            <div class="title mt-auto mb-auto text-center"><strong>{{msg}}</strong></div>
         </div>
     </div>
 </template>

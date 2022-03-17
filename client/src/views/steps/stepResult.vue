@@ -1,20 +1,13 @@
 <template>
     <div class="step-result">
-        <div style="font-size: 20px;">
-            <strong>Step 6. 결과물</strong>
-            <hr>
-        </div>
-        <div class="frame">
-            <div class="mb-5">
-                <div ref="result" :class="`m-auto outter-frame outter-frame-${columns}-${rows}`">
-                    <result-frame :rows="rows" :columns="columns"></result-frame>
-                </div>
-            </div>
-        </div>
         <div class="text-center">
-            <button class="btn btn-outline-primary mr-3" @click="$emit('on-previous')">이 전 단 계</button>
             <button class="btn btn-outline-primary mr-3" @click="saveResult">저 장 하 기</button>
-            <button class="btn btn-outline-primary">공 유 하 기</button>
+            <button class="btn btn-outline-primary" @click="$router.push('/')">다 시 하 기</button>
+        </div>
+        <div class="mb-5">
+            <div ref="result" :class="`m-auto outter-frame outter-frame-${columns}-${rows}`">
+                <result-frame :rows="rows" :columns="columns"></result-frame>
+            </div>
         </div>
     </div>
 </template>
@@ -57,10 +50,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.frame {
-    height: 620px;
-}
-
 .outter-frame {
     padding: 20px;
 

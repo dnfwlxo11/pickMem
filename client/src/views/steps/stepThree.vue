@@ -1,15 +1,13 @@
 <template>
     <div class="step-three">
-        <div class="row mb-3">
+        <div class="row p-0 m-0 mb-5">
             <basic-frame v-if="frame" class="m-auto" :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></basic-frame>
         </div>
-        <div class="row">
+        <div class="row p-0 m-0 mb-5">
             이미지 리스트
             <hr>
-            <div style="verticalScroll" ref="vertical">
-                <div class="images mr-3" v-for="(value, id) in images" :key="id">
-                    <img class="previewImg" :src="value" alt="" :id="`${id}`" @click="selectToClick(value)" draggable="false">
-                </div>
+            <div class="images w-100">
+                <img v-for="(value, id) in images" :key="id" :class="`mr-3 ${rows <= columns ? 'previewImg-horizontal' : 'previewImg-vertical'}`" :src="value" alt="" :id="`${id}`" @click="selectToClick(value)" draggable="false">
             </div>
         </div>
     </div>
@@ -23,19 +21,39 @@ export default {
     components: {
         basicFrame,
     },
+
     data() {
         return {
+            rows: 2,
+            columns: 1,
             width: 500,
             images: {},
             selectTarget: {},
             frame: null,
         }
     },
+
+    created() {
+        
+    },
+
     mounted() {
-        this.$refs.vertical.style.width = this.width;
+        let table = this.$store.getters.getFrame
+
+        this.rows = table.split('x')[0];
+        this.columns = table.split('x')[1];
+
+        if (Object.keys(this.$store.getters.getTargets).length == this.rows * this.columns) this.$store.commit('setNext', true);
+        else this.$store.commit('setNext', false);
+
         this.images = this.$store.getters.getImages;
         this.frame = this.$store.getters.getFrame;
     },
+
+    destroyed() {
+        
+    },
+
     methods: {
         selectToClick(src) {
             this.selectTarget = this.$store.getters.getTargets;
@@ -62,27 +80,29 @@ export default {
 
                 this.selectTarget = this.$store.getters.getTargets;
             }
+
+            console.log(Object.keys(this.$store.getters.getTargets).length, this.rows * this.columns)
+            if (Object.keys(this.$store.getters.getTargets).length == this.rows * this.columns) this.$store.commit('setNext', true);
+            else this.$store.commit('setNext', false);
         },
-        // dragStart(e) {
-        //     e.dataTransfer.setData("text/plain", e.target.src);
-        // },
     },
 }
 </script>
 
 <style lang="scss" scoped>
-.previewImg {
-    height: 140px;
+.previewImg-horizontal {
+    height: 150px;
     width: 200px;
 }
 
-.verticalScroll {
-    overflow-x: auto;
-    overflow-y: hidden;
-    white-space: nowrap;
+.previewImg-vertical {
+    height: 200px;
+    width: 150px;
 }
 
 .images {
-    float: left;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
 }
 </style>

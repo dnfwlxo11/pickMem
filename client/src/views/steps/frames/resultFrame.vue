@@ -64,19 +64,19 @@ img {
     // box-shadow: 0.5px 0.5px 1.5px black;
 
     border-style: solid;
-    border-width: 0 1px 1px 0;
+    border-width: 0.5px 1px 1px 0.5px;
     border-color: grey;
 }
 
 .outter-frame {
-    padding: 19px;
+    padding: 18px;
     padding-right: 0px;
     padding-bottom: 0px;
 
     // box-shadow: 0.5px 0.5px 1.5px black;
 
     border-style: solid;
-    border-width: 0 1px 1px 0;
+    border-width: 0.5px 1px 1px 0.5px;
     border-color: grey;
 
     &-1-1 {

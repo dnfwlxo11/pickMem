@@ -18,7 +18,4 @@ export default {
 </script>
 
 <style>
-.layout {
-  padding: 30px;
-}
 </style>

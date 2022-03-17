@@ -2,26 +2,33 @@
     <div class="step-one">
         <div>
             <div class="mb-3">
-                <div v-if="isLoading" style="font-size: 20px;height: 500px;">
+                <div v-if="isLoading" style="font-size: 20px;height: 450px;">
                     <div class="text-center">
                         <div><i class="mdi mdi-loading mdi-spin"></i></div>
                         <small>카메라 설정 중</small>
                     </div>
                 </div>
                 <div v-else-if="!isLoading && canPhoto" class="text-center">
-                    <div>
+                    <div v-if="rows <= columns">
                         <video v-show="!isPhotoTaken" class="canvas" :width="600" :height="450" ref="camera" autoplay></video>
                         <canvas v-show="isPhotoTaken" id="photoTaken" class="canvas" :width="600" :height="450" ref="canvas"></canvas>
                     </div>
-                    <div class="text-right">
+                    <div v-else>
+                        <video v-show="!isPhotoTaken" class="canvas" :width="450" :height="600" ref="camera" autoplay></video>
+                        <canvas v-show="isPhotoTaken" id="photoTaken" class="canvas" :width="450" :height="600" ref="canvas"></canvas>
+                    </div>
+                    <div class="mb-3">
                         ( {{getImageLen}} / 6 )
                     </div>
-                    <div v-if="getImageLen < 6" class="takePic d-flex justify-content-center align-items-center ml-auto mr-auto">
+                    <div v-if="getImageLen < 6 && !isShotPhoto" class="takePic d-flex justify-content-center align-items-center ml-auto mr-auto">
                         <i class="mdi mdi-camera-outline" style="font-size: 30px;" @click="takePhoto"></i>
                     </div>
-                    <div v-else class="text-center">
+                    <div v-else-if="getImageLen == 6" class="text-center">
                         <div class="text-center mb-2">다음 단계를 진행해주세요!</div>
                         <div><button class="btn btn-outline-danger" @click="initImage">초기화</button></div>
+                    </div>
+                    <div v-else class="takePic d-flex justify-content-center align-items-center ml-auto mr-auto">
+                        <i class="mdi mdi-camera" style="font-size: 30px;"></i>
                     </div>
                 </div>
                 <div v-else class="m-auto" style="height: 450px; width: 600px;">
@@ -69,6 +76,8 @@ export default {
     data() {
         return {
             images: {},
+            rows: 2,
+            columns: 1,
             boothWidth: null,
             boothHeight: null,
             canPhoto: false,
@@ -80,14 +89,24 @@ export default {
         }
     },
     created() {
+        
     },
     mounted() {
+        let table = this.$store.getters.getFrame
+
+        this.rows = table.split('x')[0];
+        this.columns = table.split('x')[1];
+
         this.images = this.$store.getters.getImages;
+
+        if (this.getImageLen == 6) this.$store.commit('setNext', true);
+        else this.$store.commit('setNext', false);
+
         this.createCameraElement();
     },
     beforeDestroy() {
-        this.showingImage();
-        this.stopCameraStream();
+        // this.showingImage();
+        // this.stopCameraStream();
     },
     methods: {
         createCameraElement() {
@@ -126,16 +145,16 @@ export default {
             if (!this.isPhotoTaken) {
                 this.isShotPhoto = true;
 
-                const FLASH_TIMEOUT = 50;
+                const FLASH_TIMEOUT = 500;
 
                 setTimeout(() => {
                     this.isShotPhoto = false;
                 }, FLASH_TIMEOUT);
-            }
+            } else return;
 
             const context = this.$refs.canvas.getContext('2d');
             
-            context.drawImage(this.$refs.camera, 0, 0, 600, 450);
+            this.rows <= this.columns ? context.drawImage(this.$refs.camera, 0, 0, 600, 450) : context.drawImage(this.$refs.camera, 0, 0, 450, 600)
             this.saveImage();
         },
 
@@ -144,6 +163,7 @@ export default {
             let id = (new Date).getTime();
 
             this.$set(this.images, id, image);
+            console.log(this.images, 'save images')
         },
 
         showingImage() {
@@ -151,9 +171,13 @@ export default {
         },
         
         initImage() {
+            this.$store.commit('setNext', false);
             this.$store.commit('setImages', {});
             this.$store.commit('setTargets', {});
+            this.$store.commit('setImgCanvas', {});
+            this.$store.commit('setTmpTargets', {});
             this.$store.commit('setUpdateQueue', []);
+            
             this.images = {};
         },
 
@@ -193,6 +217,15 @@ export default {
     computed: {
         getImageLen() {
             return Object.keys(this.images).length;
+        }
+    },
+    watch: {
+        images: {
+            deep: true,
+            handler() {
+                if (this.getImageLen == 6) this.$store.commit('setNext', true);
+                this.showingImage();
+            }
         }
     }
 }

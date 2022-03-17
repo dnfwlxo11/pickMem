@@ -1,8 +1,7 @@
 <template>
     <div class="basic-frame">
         <div :class="`outter-frame outter-frame-${columns}-${rows}`">
-            <div :class="`row p-0 m-0`" v-for="(row, rowIdx) of rowCnt" :key="rowIdx"
-                @drop="drop" @dragover.prevent>
+            <div :class="`row p-0 m-0`" v-for="(row, rowIdx) of rowCnt" :key="rowIdx">
                 <div :class="`pl-0 pr-0 inner-frame inner-frame-${columns}-${rows}`" v-for="(col, colIdx) of colCnt" :key="colIdx">
                     <div v-if="!images[rowIdx*colCnt.length + col]" :class="`inner-frame-${columns}-${rows}`">
                         <canvas :id="`canvas-${rowIdx*colCnt.length + col}`"></canvas>
@@ -45,21 +44,15 @@ export default {
         this.colCnt = Array.from({length: this.$props.columns}, (v, i) => i + 1);
     },
     methods: {
-        drop(e) {
-            this.$store.commit('setTarget', [e.target.id.split('-')[1], e.dataTransfer.getData('text/plain')]);
-            this.images = this.$store.getters.getTargets;
-
-            let removeQueue = this.$store.getters.getRemoveQueues;
-            removeQueue.shift();
-            this.$store.commit('setUpdateQueue', removeQueue)
-        },
-
         removeImg(target) {
             this.images[target] = null;
             this.$delete(this.images, target);
             this.$store.commit('setTargets', this.images);
+            this.$store.commit('setTmpTargets', this.images);
             this.$store.commit('setRemoveQueue', target);
             this.images = this.$store.getters.getTargets;
+
+            if (Object.keys(this.$store.getters.getTargets).length != this.rows * this.columns) this.$store.commit('setNext', false);
         },
     }
 }
