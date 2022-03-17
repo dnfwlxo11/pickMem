@@ -60,13 +60,13 @@ export default {
             console.log(this.$store.getters.getNext, 'nav', this.step)
             console.log((this.$store.getters.getImages), 'nav')
 
-            if (this.step == 1 || !canNext) {
+            if (this.step == 0 && !canNext) {
                 this.$Utils.toast('액자를 골라주세요.')
                 return;
-            } else if (this.step == 2 || !canNext) {
+            } else if (this.step == 1 && !canNext) {
                 this.$Utils.toast('사진이 부족합니다.')
                 return;
-            } else if (this.step == 3 || !canNext) {
+            } else if (this.step == 2 && !canNext) {
                 this.$Utils.toast('사진을 모두 골라주세요.')
                 return;
             }
@@ -98,7 +98,7 @@ export default {
     transform : translateY(-100%);
 }
 
-.toasted-danger {
+.custom-toast {
     background-color: red;
 }
 </style>

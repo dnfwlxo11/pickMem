@@ -25,10 +25,10 @@
                     </div>
                     <div v-else-if="getImageLen == 6" class="text-center">
                         <div class="text-center mb-2">다음 단계를 진행해주세요!</div>
-                        <div><button class="btn btn-outline-danger" @click="initImage">초기화</button></div>
+                        <div><button class="btn btn-outline-danger" @click="isOpen=true;">초기화</button></div>
                     </div>
                     <div v-else class="takePic d-flex justify-content-center align-items-center ml-auto mr-auto">
-                        <i class="mdi mdi-camera" style="font-size: 30px;"></i>
+                        <i class="mdi mdi-camera" style="font-size: 30px;" @click="$Utils.toast('너무 급해요!')"></i>
                     </div>
                 </div>
                 <div v-else class="m-auto" style="height: 450px; width: 600px;">
@@ -63,15 +63,17 @@
                 </div>
             </div>
         </div>
+        <modal v-if="isOpen" @on-close="isOpen=false" @on-submit="isOpen=false;initImage()"></modal>
     </div>
 </template>
 
 <script>
+import Modal from '../../components/modal.vue'
 
 export default {
     name: 'StepOne',
     components: {
-        
+        Modal
     },
     data() {
         return {
@@ -81,6 +83,7 @@ export default {
             boothWidth: null,
             boothHeight: null,
             canPhoto: false,
+            isOpen: false,
             isCameraOpen: false,
             isPhotoTaken: false,
             isShotPhoto: false,

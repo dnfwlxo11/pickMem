@@ -4,41 +4,42 @@
             <button class="btn btn-outline-primary mr-2" @click="saveWork">저장</button>
             <button class="btn btn-outline-primary" @click="isOpen=true">미리보기</button>
         </div>
-        <dir class="frame">
-            <div class="row m-0 p-0">
-                <div class="col-8">
-                    <canvas :class="`decoImg`" ref="canvas" width="600" height="450"></canvas>
-                    <div class="text-center">
-                        <span @click="prevImg"><i class="mdi mdi-arrow-left-bold" style="font-size: 50px;"></i></span>
-                        <span style="font-size: 25px;">{{currImg}} / {{Object.keys(images).length}}</span>
-                        <span @click="nextImg"><i class="mdi mdi-arrow-right-bold" style="font-size: 50px;"></i></span>
-                    </div>
+        <div class="row m-0 p-0">
+            <div class="col-8">
+                <div class="d-flex justify-content-center align-items-center">
+                    <canvas v-if="rows <= columns" :class="`decoImg`" ref="canvas" :width="600" :height="450"></canvas>
+                    <canvas :class="`decoImg`" ref="canvas" :width="450" :height="600"></canvas>
                 </div>
-                <div class="col-4">
-                    <span @click="isMode='filter'">필터</span> | <span @click="isMode='sticker'">스티커</span> | <span @click="isMode='draw'">그리기</span>
-                    <hr>
-                    <div v-if="isMode=='filter'">
-                        <input type="range" min="0.0" max="1.0" step="0.01" v-model="filterVal">
-                        <div v-if="images[currImg]" class="row" style="height: 450px;overflow-y: auto;">
-                            <div :class="{ 'target': targetFilter == filter }" class="col-5 text-center mr-auto ml-auto mb-3 card" v-for="(obj, filter) in filters" :key="filter" @click="selectFilter(filter)">
-                                <img class="filterImg pt-1 mb-2 m-auto">
-                                <div>{{filter}}</div>
-                            </div>
+                <div class="text-center">
+                    <span @click="prevImg"><i class="mdi mdi-arrow-left-bold" style="font-size: 50px;"></i></span>
+                    <span style="font-size: 25px;">{{currImg}} / {{Object.keys(images).length}}</span>
+                    <span @click="nextImg"><i class="mdi mdi-arrow-right-bold" style="font-size: 50px;"></i></span>
+                </div>
+            </div>
+            <div class="col-4">
+                <span @click="isMode='filter'">필터</span> | <span @click="isMode='sticker'">스티커</span> | <span @click="isMode='draw'">그리기</span>
+                <hr>
+                <div v-if="isMode=='filter'">
+                    <input type="range" min="0.0" max="1.0" step="0.01" v-model="filterVal">
+                    <div v-if="images[currImg]" class="row" style="height: 450px;overflow-y: auto;">
+                        <div :class="{ 'target': targetFilter == filter }" class="col-5 text-center mr-auto ml-auto mb-3 card" v-for="(obj, filter) in filters" :key="filter" @click="selectFilter(filter)">
+                            <img :class="`${rows <= columns ? 'filterImg-horizontal' : 'filterImg-vertical'}`" class="pt-1 mb-2 m-auto">
+                            <div>{{filter}}</div>
                         </div>
                     </div>
-                    <div v-else-if="isMode=='sticker'" style="height: 450px;overflow-y: auto;">
-                        <div v-for="(value, theme) in sticker" :key="theme">
-                            <div class="mb-3"><strong>{{theme}} 테마</strong></div>
-                            <div class="row m-0 p-0 mb-5">
-                                <div :id="`${theme}_${item}`" :class="{ 'target': targetSticker == `${theme}_${item}` }" class="col-3 mb-3 text-center" v-for="(item, idx) of value" :key="idx" @click="isSticker=!isSticker;selectSticker(`${theme}_${item}`)">
-                                    <img :ref="`${theme}_${item}`" class="sticker" :src="`/stickers/${theme}_${item}.png`">
-                                </div>
+                </div>
+                <div v-else-if="isMode=='sticker'" style="height: 450px;overflow-y: auto;">
+                    <div v-for="(value, theme) in sticker" :key="theme">
+                        <div class="mb-3"><strong>{{theme}} 테마</strong></div>
+                        <div class="row m-0 p-0 mb-5">
+                            <div :id="`${theme}_${item}`" :class="{ 'target': targetSticker == `${theme}_${item}` }" class="col-3 mb-3 text-center" v-for="(item, idx) of value" :key="idx" @click="isSticker=!isSticker;selectSticker(`${theme}_${item}`)">
+                                <img :ref="`${theme}_${item}`" class="sticker" :src="`/stickers/${theme}_${item}.png`">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </dir>
+        </div>
         <preview-modal v-if="isOpen" @on-close="isOpen=false" :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></preview-modal>
     </div>
 </template>
@@ -83,6 +84,11 @@ export default {
         this.frame = this.$store.getters.getFrame;
     },
     mounted() {
+        let table = this.$store.getters.getFrame
+
+        this.rows = table.split('x')[0];
+        this.columns = table.split('x')[1];
+
         this.init();
         window.addEventListener('keydown', this.setKeydownEvent);
     },
@@ -288,9 +294,14 @@ export default {
     background-color: #FFF;
 }
 
-.filterImg {
+.filterImg-horizontal {
     height: 75px;
     width: 100px;
+}
+
+.filterImg-vertical {
+    height: 100px;
+    width: 75px;
 }
 
 .target {
