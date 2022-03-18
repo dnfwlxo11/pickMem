@@ -71,6 +71,7 @@ img {
     padding-right: 0px;
     padding-bottom: 0px;
     box-shadow: 0.5px 0.5px 1.5px black;
+    background-color: #FFF;
 
     &-1-1 {
         height: 350px;

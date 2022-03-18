@@ -3,11 +3,13 @@
         <div class="row p-0 m-0 mb-5">
             <basic-frame v-if="frame" class="m-auto" :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></basic-frame>
         </div>
-        <div class="row p-0 m-0 mb-5">
-            이미지 리스트
+        <div class="m-auto" :style="`width: ${rows <= columns ? 6 * 200 : 6 * 150}px`">
+            <div>이미지 리스트</div>
             <hr>
-            <div class="images w-100">
-                <img v-for="(value, id) in images" :key="id" :class="`mr-3 ${rows <= columns ? 'previewImg-horizontal' : 'previewImg-vertical'}`" :src="value" alt="" :id="`${id}`" @click="selectToClick(value)" draggable="false">
+            <div class="images">
+                <div class="mb-3">
+                    <img v-for="(value, id) in images" :key="id" :class="`mr-3 ${rows <= columns ? 'previewImg-horizontal' : 'previewImg-vertical'}`" :src="value" alt="" :id="`${id}`" @click="selectToClick(value)" draggable="false">
+                </div>
             </div>
         </div>
     </div>
@@ -60,7 +62,7 @@ export default {
             let table = this.frame.split('x');
 
             if (Object.keys(this.selectTarget).length == (parseInt(table[0]) * parseInt(table[1]))) {
-                console.log('이미 모두 골랐어요.')
+                this.$Utils.toast('이미 모두 골랐어요.')
                 return;
             } else {
                 let targetLen = Object.keys(this.selectTarget).length;
@@ -81,7 +83,6 @@ export default {
                 this.selectTarget = this.$store.getters.getTargets;
             }
 
-            console.log(Object.keys(this.$store.getters.getTargets).length, this.rows * this.columns)
             if (Object.keys(this.$store.getters.getTargets).length == this.rows * this.columns) this.$store.commit('setNext', true);
             else this.$store.commit('setNext', false);
         },

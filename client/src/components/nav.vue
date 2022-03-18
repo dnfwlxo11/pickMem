@@ -12,7 +12,6 @@
                     <i class="mdi mdi-chevron-right" @click="$emit('on-next')"></i>
                 </div>
             </div>
-            <hr>
         </div>
     </div>
 </template>
@@ -31,14 +30,15 @@ export default {
 
 <style lang="scss" scoped>
 .title {
-    font-size: 30px;
+    font-size: 25px;
 }
 
 .nav {
-    height: 100px;
+    height: 75px;
+    border-bottom: 1px solid lightgrey;
 }
 
 .mdi {
-    font-size: 30px;
+    font-size: 25px;
 }
 </style>

@@ -5,7 +5,7 @@
             <button class="btn btn-outline-primary" @click="isOpen=true">미리보기</button>
         </div>
         <div class="row m-0 p-0">
-            <div class="col-8">
+            <div class="col-md-8">
                 <div class="d-flex justify-content-center align-items-center">
                     <canvas v-if="rows <= columns" :class="`decoImg`" ref="canvas" :width="450" :height="600"></canvas>
                     <canvas v-else :class="`decoImg`" ref="canvas" :width="600" :height="450"></canvas>
@@ -16,7 +16,7 @@
                     <span @click="nextImg"><i class="mdi mdi-arrow-right-bold" style="font-size: 50px;"></i></span>
                 </div>
             </div>
-            <div class="col-4">
+            <div class="col-md-4">
                 <span @click="isMode='filter'">필터</span> | <span @click="isMode='sticker'">스티커</span> | <span @click="isMode='draw'">그리기</span>
                 <hr>
                 <div v-if="isMode=='filter'">
@@ -28,7 +28,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-else-if="isMode=='sticker'" style="height: 450px;overflow-y: auto;">
+                <div v-else-if="isMode=='sticker'" :style="`height: ${600}px;overflow-y: auto;`">
                     <div v-for="(value, theme) in sticker" :key="theme">
                         <div class="mb-3"><strong>{{theme}} 테마</strong></div>
                         <div class="row m-0 p-0 mb-5">
@@ -280,6 +280,11 @@ export default {
 
             this.saveWork();
         },
+    },
+    computed: {
+        getContentHeight() {
+            return window.screen.availHeight;
+        }
     },
 }
 </script>
