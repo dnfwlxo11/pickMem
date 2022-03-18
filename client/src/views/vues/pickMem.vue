@@ -1,16 +1,14 @@
 <template>
-    <div class="pick-mem">
-        <div class="content">
-            <nav-bar :msg="msg[step]" @on-next="nextStep" @on-previous="previousStep"></nav-bar>
-            <div>
-                <div class="container">
-                    <step-one v-if="step==0"></step-one>
-                    <step-two v-else-if="step==1"></step-two>
-                    <step-three v-else-if="step==2"></step-three>
-                    <step-four v-else-if="step==3"></step-four>
-                    <step-five v-else-if="step==4"></step-five>
-                    <step-result v-else @on-previous="previousStep"></step-result>
-                </div>
+    <div class="pick-mem h-100">
+        <div class="content" style="overflow-y: auto">
+            <nav-bar class="mb-3" :msg="msg[step]" @on-next="nextStep" @on-previous="previousStep"></nav-bar>
+            <div class="container h-75">
+                <step-one v-if="step==0"></step-one>
+                <step-two v-else-if="step==1"></step-two>
+                <step-three v-else-if="step==2"></step-three>
+                <step-four v-else-if="step==3"></step-four>
+                <step-five v-else-if="step==4"></step-five>
+                <step-result v-else @on-previous="previousStep"></step-result>
             </div>
         </div>
         <footer-bar class="footer"></footer-bar>
@@ -55,10 +53,7 @@ export default {
     },
     methods: {
         nextStep() {
-            console.log(this.$Utils.toast())
             let canNext = this.$store.getters.getNext;
-            console.log(this.$store.getters.getNext, 'nav', this.step)
-            console.log((this.$store.getters.getImages), 'nav')
 
             if (this.step == 0 && !canNext) {
                 this.$Utils.toast('액자를 골라주세요.')
@@ -82,19 +77,24 @@ export default {
             this.step -= 1;
         },
     },
+    computed: {
+        getClientHeight() {
+            return window.innerHeight;
+        }
+    },
 }
 </script>
 
 <style scoped>
 .content {
-    height: auto;
-    min-height: 100%;
+    height: 100%;
     padding-bottom: 50px;
 }
 
 .footer {
     height: 50px;
     position : relative;
+    background-color: #FFF;
     transform : translateY(-100%);
 }
 

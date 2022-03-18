@@ -4,6 +4,9 @@
             <small>프레임: {{targetFrame ? targetFrame : "선택 안함"}}</small>
         </div>
         <div class="mb-5">
+            <div class="text-right mb-3">
+                <strong>세로가 긴 액자는 4:3 비율, 가로가 긴 액자는 3:4 비율입니다.</strong>
+            </div>
             <div class="text-left">
                 <div class="mb-3 pl-3"><strong>2 Cuts</strong></div>
                 <div class="mb-5 text-center">
@@ -133,5 +136,9 @@ export default {
     background-color: grey;
     color: #FFF;
     border-radius: 0.5rem;
+}
+
+.step-one {
+    padding-bottom: 50px;
 }
 </style>

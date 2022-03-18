@@ -28,7 +28,7 @@
             <div class="col-md-4">
                 <span @click="isMode='bg'">배경색</span> | <span @click="isMode='sticker'">스티커</span>
                 <hr>
-                <div v-if="isMode=='bg'"  style="height: 400px;overflow-y: auto;">
+                <div v-if="isMode=='bg'" :style="`max-height: ${600}px;overflow-y: auto;`">
                     <div v-for="(value, theme) in bg" :key="theme">
                         <div class="mb-3"><strong>{{theme}} 테마</strong></div>
                         <div class="row m-0 p-0 mb-3">
@@ -48,7 +48,7 @@
                             <div class="mb-3"><strong>{{theme}} 테마</strong></div>
                             <div class="row m-0 p-0 mb-5">
                                 <div :id="`${theme}_${item}`" :class="{ 'target': targetSticker == `${theme}_${item}` }" class="col-3 mb-3 text-center" v-for="(item, idx) of value" :key="idx" @click="isSticker=!isSticker;selectSticker(`${theme}_${item}`)">
-                                    <img :ref="`${theme}_${item}`" class="sticker" :src="require(`@/assets/stickers/${theme}_${item}.png`)">
+                                    <img :ref="`${theme}_${item}`" class="sticker" :src="require(`@/assets/stickers/${theme}_${item}.png`)" draggable="false">
                                 </div>
                             </div>
                         </div>
@@ -90,6 +90,7 @@ export default {
             canvasWidth: null,
             canvas: null,
             fontSize: 16,
+            contentHeight: 500,
             sticker: {
                 'cute_handdrawn': [],
                 'cute_natural_doodle': [],
@@ -102,6 +103,24 @@ export default {
                 'astro': ['#F25E7A', '#4A2B8C', '#5155A6', '#05F2DB', '#F2E963'],
                 'cartoon': ['#636AF2', '#41A0F2', '#A2DCF2', '#04D98B', '#F2E205'],
                 'ancient': ['#1D5948', '#F2BF5E', '#A6864B', '#F2D091', '#732509'],
+                'simple2': ['#F2F2F3', '#A6A6A6', '#595959', '#262626', '#0D0D0D'],
+                'modern2': ['#131B26', '#D9B95B', '#D9C484', '#F2ECE4', '#D97D5B'],
+                'warm2': ['#D9C077', '#F29F05', '#D97904', '#BF4904', '#F2F2F2'],
+                'astro2': ['#F25E7A', '#4A2B8C', '#5155A6', '#05F2DB', '#F2E963'],
+                'cartoon2': ['#636AF2', '#41A0F2', '#A2DCF2', '#04D98B', '#F2E205'],
+                'ancient2': ['#1D5948', '#F2BF5E', '#A6864B', '#F2D091', '#732509'],
+                'simple3': ['#F2F2F3', '#A6A6A6', '#595959', '#262626', '#0D0D0D'],
+                'modern3': ['#131B26', '#D9B95B', '#D9C484', '#F2ECE4', '#D97D5B'],
+                'warm3': ['#D9C077', '#F29F05', '#D97904', '#BF4904', '#F2F2F2'],
+                'astro3': ['#F25E7A', '#4A2B8C', '#5155A6', '#05F2DB', '#F2E963'],
+                'cartoon3': ['#636AF2', '#41A0F2', '#A2DCF2', '#04D98B', '#F2E205'],
+                'ancient3': ['#1D5948', '#F2BF5E', '#A6864B', '#F2D091', '#732509'],
+                'simple4': ['#F2F2F3', '#A6A6A6', '#595959', '#262626', '#0D0D0D'],
+                'modern4': ['#131B26', '#D9B95B', '#D9C484', '#F2ECE4', '#D97D5B'],
+                'warm4': ['#D9C077', '#F29F05', '#D97904', '#BF4904', '#F2F2F2'],
+                'astro4': ['#F25E7A', '#4A2B8C', '#5155A6', '#05F2DB', '#F2E963'],
+                'cartoon4': ['#636AF2', '#41A0F2', '#A2DCF2', '#04D98B', '#F2E205'],
+                'ancient4': ['#1D5948', '#F2BF5E', '#A6864B', '#F2D091', '#732509'],
             }
         }
     },
@@ -109,6 +128,7 @@ export default {
         this.frame = this.$store.getters.getFrame;
     },
     mounted() {
+        
         this.init();
         window.addEventListener('keydown', this.setKeydownEvent);
     },
@@ -140,7 +160,6 @@ export default {
             if (this.$store.getters.getCanvas) {
                 await this.loadCanvasToJSON();
                 this.setCanvasOption();
-                console.log(this.canvas.backgroundColor, 'load')
                 this.targetColor = this.canvas.backgroundColor;
                 this.canvas.renderAll();
             }
@@ -220,7 +239,7 @@ export default {
         saveWork() {
             this.isWork = false;
             this.targetSticker = null,
-            this.selectBg(this.targetColor);
+            // this.selectBg(this.targetColor);
             this.setWorkMode();
             this.$store.commit('setCanvas', JSON.stringify(this.canvas.toObject(['id'])));
             this.$store.commit('setFrameImg', this.canvas.toDataURL({ format: 'image/png' }));
@@ -287,11 +306,21 @@ export default {
             }
         },
         selectBg(color) {
-            this.targetColor = color;
-            this.canvas.backgroundColor = color;
+            if (this.targetColor == color) {
+                this.targetColor = '#FFF';
+                this.canvas.backgroundColor = '#FFF';
+            } else {
+                this.targetColor = color;
+                this.canvas.backgroundColor = color;
+            }
             
             this.canvas.renderAll();
         },
+    },
+    computed: {
+        getContentHeight() {
+            return window.screen.availHeight;
+        }
     },
 }
 </script>

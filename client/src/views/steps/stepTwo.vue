@@ -10,12 +10,12 @@
                 </div>
                 <div v-else-if="!isLoading && canPhoto" class="text-center">
                     <div v-if="rows <= columns">
-                        <video v-show="!isPhotoTaken" class="canvas" :width="600" :height="450" ref="camera" autoplay></video>
-                        <canvas v-show="isPhotoTaken" id="photoTaken" class="canvas" :width="600" :height="450" ref="canvas"></canvas>
+                        <video v-show="!isPhotoTaken" :width="600" :height="450" ref="camera" autoplay></video>
+                        <canvas v-show="isPhotoTaken" id="photoTaken" :width="600" :height="450" ref="canvas"></canvas>
                     </div>
                     <div v-else>
-                        <video v-show="!isPhotoTaken" class="canvas" :width="450" :height="600" ref="camera" autoplay></video>
-                        <canvas v-show="isPhotoTaken" id="photoTaken" class="canvas" :width="450" :height="600" ref="canvas"></canvas>
+                        <video v-show="!isPhotoTaken" :width="450" :height="600" ref="camera" autoplay></video>
+                        <canvas v-show="isPhotoTaken" id="photoTaken" width="450" :height="600" ref="canvas"></canvas>
                     </div>
                     <div class="mb-3">
                         ( {{getImageLen}} / 6 )
@@ -166,7 +166,6 @@ export default {
             let id = (new Date).getTime();
 
             this.$set(this.images, id, image);
-            console.log(this.images, 'save images')
         },
 
         showingImage() {
