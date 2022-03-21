@@ -2,14 +2,14 @@
     <div class="nav">
         <div class="text-center mt-auto mb-auto w-100">
             <div class="row m-0 p-0">
-                <div class="col-2">
-                    <i class="mdi mdi-chevron-left" @click="$emit('on-previous')"></i>
+                <div class="col-2 m-auto">
+                    <div class="step-btn" @click="$emit('on-previous')"><i class="mdi mdi-chevron-left"></i><strong>이전</strong></div>
                 </div>
                 <div class="col-8">
                     <div class="title"><strong>{{msg}}</strong></div>
                 </div>
-                <div class="col-2">
-                    <i class="mdi mdi-chevron-right" @click="$emit('on-next')"></i>
+                <div class="col-2 m-auto">
+                    <div class="step-btn" @click="$emit('on-next')"><strong>다음</strong><i class="mdi mdi-chevron-right"></i></div>
                 </div>
             </div>
         </div>
@@ -22,7 +22,7 @@ export default {
     props: {
         msg: {
             type: String,
-            default: 'Pick the Moment'
+            default: 'Pick the Momory'
         }
     }
 }
@@ -38,7 +38,7 @@ export default {
     border-bottom: 1px solid lightgrey;
 }
 
-.mdi {
-    font-size: 25px;
+.step-btn {
+    font-size: 18px;
 }
 </style>

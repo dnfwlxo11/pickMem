@@ -15,7 +15,7 @@ export default new Vuex.Store({
     images: {},
     selectTarget: {},
     tmpTarget: {},
-    removeQueue: [],
+    orderQueue: [],
   },
   mutations: {
     setNext(state, val) {
@@ -40,10 +40,10 @@ export default new Vuex.Store({
       state.tmpTarget = targetObj;
     },
     setRemoveQueue(state, target) {
-      state.removeQueue.push(target);
+      state.orderQueue.push(target);
     },
     setUpdateQueue(state, targetArr) {
-      state.removeQueue = targetArr;
+      state.orderQueue = targetArr;
     },
     setFrame(state, frame) {
       state.frame = frame;
@@ -70,10 +70,10 @@ export default new Vuex.Store({
       return state.selectTarget;
     },
     getRemoveQueues(state) {
-      return state.removeQueue;
+      return state.orderQueue;
     },
     getRemoveQueueCnt(state) {
-      return state.removeQueue.length;
+      return state.orderQueue.length;
     },
     getFrame(state) {
       return state.frame;

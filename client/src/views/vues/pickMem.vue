@@ -1,8 +1,8 @@
 <template>
     <div class="pick-mem h-100">
         <div class="content" style="overflow-y: auto">
-            <nav-bar class="mb-3" :msg="msg[step]" @on-next="nextStep" @on-previous="previousStep"></nav-bar>
-            <div class="container h-75">
+            <nav-bar class="nav" :msg="msg[step]" @on-next="nextStep" @on-previous="previousStep"></nav-bar>
+            <div class="body container h-75">
                 <step-one v-if="step==0"></step-one>
                 <step-two v-else-if="step==1"></step-two>
                 <step-three v-else-if="step==2"></step-three>
@@ -86,6 +86,17 @@ export default {
 </script>
 
 <style scoped>
+.body {
+    margin-top: 100px;
+}
+
+.nav {
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    background-color: #FFF;
+}
+
 .content {
     height: 100%;
     padding-bottom: 50px;

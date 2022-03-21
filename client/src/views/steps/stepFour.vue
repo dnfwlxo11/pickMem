@@ -21,8 +21,8 @@
                         <canvas v-if="frame" :class="`outter-frame outter-frame-${parseInt(frame.split('x')[0])}-${parseInt(frame.split('x')[1])}`" ref="canvas"></canvas>
                     </div>
                 </div>
-                <div class="text-center">
-                    <small>실제 효과들은 사진 뒤에 표시됩니다. <br> 미리보기 모드를 통해 확인할 수 있습니다.</small>
+                <div class="text-center text-danger">
+                    <strong>실제 효과들은 사진 뒤에 표시됩니다. <br> 미리보기 모드를 통해 확인할 수 있습니다.</strong>
                 </div>
             </div>
             <div class="col-md-4">
@@ -103,24 +103,6 @@ export default {
                 'astro': ['#F25E7A', '#4A2B8C', '#5155A6', '#05F2DB', '#F2E963'],
                 'cartoon': ['#636AF2', '#41A0F2', '#A2DCF2', '#04D98B', '#F2E205'],
                 'ancient': ['#1D5948', '#F2BF5E', '#A6864B', '#F2D091', '#732509'],
-                'simple2': ['#F2F2F3', '#A6A6A6', '#595959', '#262626', '#0D0D0D'],
-                'modern2': ['#131B26', '#D9B95B', '#D9C484', '#F2ECE4', '#D97D5B'],
-                'warm2': ['#D9C077', '#F29F05', '#D97904', '#BF4904', '#F2F2F2'],
-                'astro2': ['#F25E7A', '#4A2B8C', '#5155A6', '#05F2DB', '#F2E963'],
-                'cartoon2': ['#636AF2', '#41A0F2', '#A2DCF2', '#04D98B', '#F2E205'],
-                'ancient2': ['#1D5948', '#F2BF5E', '#A6864B', '#F2D091', '#732509'],
-                'simple3': ['#F2F2F3', '#A6A6A6', '#595959', '#262626', '#0D0D0D'],
-                'modern3': ['#131B26', '#D9B95B', '#D9C484', '#F2ECE4', '#D97D5B'],
-                'warm3': ['#D9C077', '#F29F05', '#D97904', '#BF4904', '#F2F2F2'],
-                'astro3': ['#F25E7A', '#4A2B8C', '#5155A6', '#05F2DB', '#F2E963'],
-                'cartoon3': ['#636AF2', '#41A0F2', '#A2DCF2', '#04D98B', '#F2E205'],
-                'ancient3': ['#1D5948', '#F2BF5E', '#A6864B', '#F2D091', '#732509'],
-                'simple4': ['#F2F2F3', '#A6A6A6', '#595959', '#262626', '#0D0D0D'],
-                'modern4': ['#131B26', '#D9B95B', '#D9C484', '#F2ECE4', '#D97D5B'],
-                'warm4': ['#D9C077', '#F29F05', '#D97904', '#BF4904', '#F2F2F2'],
-                'astro4': ['#F25E7A', '#4A2B8C', '#5155A6', '#05F2DB', '#F2E963'],
-                'cartoon4': ['#636AF2', '#41A0F2', '#A2DCF2', '#04D98B', '#F2E205'],
-                'ancient4': ['#1D5948', '#F2BF5E', '#A6864B', '#F2D091', '#732509'],
             }
         }
     },

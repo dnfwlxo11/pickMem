@@ -1,17 +1,28 @@
 <template>
     <div class="step-three">
-        <div class="row p-0 m-0 mb-5">
-            <basic-frame v-if="frame" class="m-auto" :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></basic-frame>
-        </div>
-        <div class="m-auto" :style="`width: ${rows <= columns ? 6 * 200 : 6 * 150}px`">
-            <div>이미지 리스트</div>
-            <hr>
-            <div class="images">
-                <div class="mb-3">
-                    <img v-for="(value, id) in images" :key="id" :class="`mr-3 ${rows <= columns ? 'previewImg-horizontal' : 'previewImg-vertical'}`" :src="value" alt="" :id="`${id}`" @click="selectToClick(value)" draggable="false">
+        <div class="row p-0 m-0 align-items-center">
+            <div class="col-md-8">
+                <div class="d-flex justify-content-center mb-3">
+                    <basic-frame v-if="frame" :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></basic-frame>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <strong class="text-danger">우측의 이미지를 클릭해서 골라주세요.</strong>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="m-auto">
+                    <div>이미지 리스트</div>
+                    <hr>
+                    <div class="images text-center">
+                        <div class="mb-3" v-for="(value, id) in images" :key="id">
+                            <img :class="`mr-3 ${rows <= columns ? 'previewImg-horizontal' : 'previewImg-vertical'}`" :src="value" alt="" :id="`${id}`" @click="selectToClick(value)" draggable="false">
+                            <hr>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        
     </div>
 </template>
 
@@ -32,11 +43,11 @@ export default {
             images: {},
             selectTarget: {},
             frame: null,
+            queue: [],
         }
     },
 
-    created() {
-        
+    created() {   
     },
 
     mounted() {
@@ -44,6 +55,9 @@ export default {
 
         this.rows = table.split('x')[0];
         this.columns = table.split('x')[1];
+
+        this.queue = Array.from({length: this.rows * this.columns}, (v, i) => i + 1);
+        this.$store.commit('setUpdateQueue', this.queue);
 
         if (Object.keys(this.$store.getters.getTargets).length == this.rows * this.columns) this.$store.commit('setNext', true);
         else this.$store.commit('setNext', false);
@@ -65,20 +79,12 @@ export default {
                 this.$Utils.toast('이미 모두 골랐어요.')
                 return;
             } else {
-                let targetLen = Object.keys(this.selectTarget).length;
+                this.queue = this.$store.getters.getRemoveQueues;
+                let recoverKey = this.queue.shift();
 
-                if (this.$store.getters.getRemoveQueueCnt) {
-                    let removeQueue = this.$store.getters.getRemoveQueues;
-                    let recoverKey = removeQueue.shift();
-
-                    this.$store.commit('setUpdateQueue', removeQueue);
-                    this.$store.commit('setTarget', [recoverKey, src]);
-                    this.$store.commit('setTmpTarget', [recoverKey, src]);
-                }
-                else {
-                    this.$store.commit('setTarget', [targetLen + 1, src]);
-                    this.$store.commit('setTmpTarget', [targetLen + 1, src]);
-                }
+                this.$store.commit('setUpdateQueue', this.queue);
+                this.$store.commit('setTarget', [recoverKey, src]);
+                this.$store.commit('setTmpTarget', [recoverKey, src]);
 
                 this.selectTarget = this.$store.getters.getTargets;
             }
@@ -102,8 +108,9 @@ export default {
 }
 
 .images {
-    overflow-x: scroll;
-    overflow-y: hidden;
+    max-height: 600px;
+    overflow-y: scroll;
+    overflow-x: hidden;
     white-space: nowrap;
 }
 </style>

@@ -4,7 +4,12 @@
             <div :class="`row p-0 m-0`" v-for="(row, rowIdx) of rowCnt" :key="rowIdx">
                 <div :class="`pl-0 pr-0 inner-frame inner-frame-${columns}-${rows}`" v-for="(col, colIdx) of colCnt" :key="colIdx">
                     <div v-if="!images[rowIdx*colCnt.length + col]" :class="`inner-frame-${columns}-${rows}`">
-                        <canvas :id="`canvas-${rowIdx*colCnt.length + col}`"></canvas>
+                        <div class="h-100 w-100 d-flex justify-content-center align-items-center">
+                            <div class="order-badge d-flex justify-content-center align-items-center">
+                                {{(orderArray.indexOf(rowIdx*colCnt.length + col) + 1)}}
+                            </div>
+                        </div>
+                        <!-- <canvas :id="`canvas-${rowIdx*colCnt.length + col}`"></canvas> -->
                     </div>
                     <div v-else :class="`inner-frame-${columns}-${rows}`">
                         <img :src="images[rowIdx*colCnt.length + col]" :id="`canvas-${rowIdx*colCnt.length + col}`" draggable="false">
@@ -34,6 +39,7 @@ export default {
             rowCnt: [],
             colCnt: [],
             images: {},
+            orderArray: null,
         }
     },
     created() {
@@ -42,6 +48,7 @@ export default {
         this.images = this.$store.getters.getTargets;
         this.rowCnt = Array.from({length: this.$props.rows}, (v, i) => i + 1);
         this.colCnt = Array.from({length: this.$props.columns}, (v, i) => i + 1);
+        this.orderArray = this.$store.getters.getRemoveQueues;
     },
     methods: {
         removeImg(target) {
@@ -54,7 +61,7 @@ export default {
 
             if (Object.keys(this.$store.getters.getTargets).length != this.rows * this.columns) this.$store.commit('setNext', false);
         },
-    }
+    },
 }
 </script>
 
@@ -64,6 +71,16 @@ img {
     object-fit: cover;
     height: 100%;
     width: 100%;
+}
+
+.order-badge {
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    background-color: lightslategrey;
+    color: #FFF;
+    font-size: 30px;
+    box-shadow: 0.5px 0.5px 1.5px black;
 }
 
 .outter-frame {
