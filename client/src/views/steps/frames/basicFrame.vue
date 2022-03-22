@@ -6,7 +6,7 @@
                     <div v-if="!images[rowIdx*colCnt.length + col]" :class="`inner-frame-${columns}-${rows}`">
                         <div class="h-100 w-100 d-flex justify-content-center align-items-center">
                             <div class="order-badge d-flex justify-content-center align-items-center">
-                                {{(orderArray.indexOf(rowIdx*colCnt.length + col) + 1)}}
+                                {{(orderArray.indexOf(rowIdx*colCnt.length + col) + 1) + Object.keys(images).length }}
                             </div>
                         </div>
                         <!-- <canvas :id="`canvas-${rowIdx*colCnt.length + col}`"></canvas> -->

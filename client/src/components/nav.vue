@@ -8,9 +8,10 @@
                 <div class="col-8">
                     <div class="title"><strong>{{msg}}</strong></div>
                 </div>
-                <div class="col-2 m-auto">
+                <div v-if="!last" class="col-2 m-auto">
                     <div class="step-btn" @click="$emit('on-next')"><strong>다음</strong><i class="mdi mdi-chevron-right"></i></div>
                 </div>
+                <div class="col-2 m-auto"></div>
             </div>
         </div>
     </div>
@@ -23,6 +24,10 @@ export default {
         msg: {
             type: String,
             default: 'Pick the Momory'
+        },
+        last: {
+            type: Boolean,
+            default: false,
         }
     }
 }

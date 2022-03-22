@@ -55,12 +55,12 @@
 
 <style lang="scss" scoped>
   .modal-container {
-    max-width: 640px;
-    height: 400px;
-    margin-top: 30%;
+    max-width: 300px;
   }
 
   .modal {
+    margin-top: 300px;
+
     &-mask {
       position: fixed;
       z-index: 1100;
@@ -93,7 +93,7 @@
     }
 
     &-body {
-        height: 300px;
+        height: auto;
     }
   }
 

@@ -26,34 +26,50 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <span @click="isMode='bg'">배경색</span> | <span @click="isMode='sticker'">스티커</span>
+                <span @click="isMode='bg'" :class="{ 'target': isMode=='bg' }">배경색</span> | 
+                <span @click="isMode='pattern'" :class="{ 'target': isMode=='pattern' }">패턴</span> |
+                <span @click="isMode='sticker'" :class="{ 'target': isMode=='sticker' }">스티커</span>
                 <hr>
-                <div v-if="isMode=='bg'" :style="`max-height: ${600}px;overflow-y: auto;`">
-                    <div v-for="(value, theme) in bg" :key="theme">
-                        <div class="mb-3"><strong>{{theme}} 테마</strong></div>
-                        <div class="row m-0 p-0 mb-3">
-                            <div :class="{ 'target': targetColor == color }" class="col-2 m-0 p-0 pt-1 pb-1" v-for="(color, idx) of value" :key="idx">
-                                <div class="bg m-auto" :style="{'background-color': color}" @click="selectBg(color)"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div v-else-if="isMode=='sticker'" style="height: 450px;overflow-y: auto;">
-                    <div class="mb-5">
-                        <button :class="{'btn-primary': isText, 'btn-outline-primary': !isText}" class="btn mr-3" @click="isText=!isText">텍스트</button>
-                        <input type="number" v-model="fontSize">
-                    </div>
-                    <div>
-                        <div v-for="(value, theme) in sticker" :key="theme">
+                <div :style="`height: 600px;overflow-y: auto;`">
+                    <div v-if="isMode=='bg'">
+                        <div v-for="(value, theme) in bg" :key="theme">
                             <div class="mb-3"><strong>{{theme}} 테마</strong></div>
-                            <div class="row m-0 p-0 mb-5">
-                                <div :id="`${theme}_${item}`" :class="{ 'target': targetSticker == `${theme}_${item}` }" class="col-3 mb-3 text-center" v-for="(item, idx) of value" :key="idx" @click="isSticker=!isSticker;selectSticker(`${theme}_${item}`)">
-                                    <img :ref="`${theme}_${item}`" class="sticker" :src="require(`@/assets/stickers/${theme}_${item}.png`)" draggable="false">
+                            <div class="row m-0 p-0 mb-3">
+                                <div :class="{ 'target': targetColor == color }" class="col-2 m-0 p-0 pt-1 pb-1" v-for="(color, idx) of value" :key="idx">
+                                    <div class="bg m-auto" :style="{'background-color': color}" @click="selectBg(color)"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    <div v-else-if="isMode=='pattern'">
+                        <div>
+                            <div v-for="(value, theme) in pattern" :key="theme">
+                                <div class="mb-3"><strong>{{theme}} 테마</strong></div>
+                                <div class="row m-0 p-0 mb-5">
+                                    <div :id="`pattern_${item}`" :class="{ 'target': targetPattern == `pattern_${item}` }" class="col-3 mb-3 text-center" v-for="(item, idx) of value" :key="idx">
+                                        <img :ref="`pattern_${item}`" class="pattern" :src="require(`@/assets/pattern/pattern_${item}.png`)" @click="selectPattern(`pattern_${item}`)" draggable="false">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else-if="isMode=='sticker'">
+                        <div class="mb-5">
+                            <button :class="{'btn-primary': isText, 'btn-outline-primary': !isText}" class="btn mr-3" @click="isText=!isText">텍스트</button>
+                            <input type="number" v-model="fontSize">
+                        </div>
+                        <div>
+                            <div v-for="(value, theme) in sticker" :key="theme">
+                                <div class="mb-3"><strong>{{theme}} 테마</strong></div>
+                                <div class="row m-0 p-0 mb-5">
+                                    <div :id="`${theme}_${item}`" :class="{ 'target': targetSticker == `${theme}_${item}` }" class="col-3 mb-3 text-center" v-for="(item, idx) of value" :key="idx" @click="isSticker=!isSticker;selectSticker(`${theme}_${item}`)">
+                                        <img :ref="`${theme}_${item}`" class="sticker" :src="require(`@/assets/stickers/${theme}_${item}.png`)" draggable="false">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>    
             </div>
         </div>
         <preview-modal v-if="isOpen" @on-close="isOpen=false" :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></preview-modal>
@@ -80,6 +96,7 @@ export default {
             images: {},
             targetSticker: null,
             targetColor: '#00ff0000',
+            targetPattern: null,
             frame: null,
             isMode: 'bg',
             isWork: false,
@@ -95,6 +112,9 @@ export default {
                 'cute_handdrawn': [],
                 'cute_natural_doodle': [],
                 'flower_leaf': [],
+            },
+            pattern: {
+                'basic': [],
             },
             bg: {
                 'simple': ['#F2F2F3', '#A6A6A6', '#595959', '#262626', '#0D0D0D'],
@@ -132,6 +152,7 @@ export default {
             this.sticker.cute_handdrawn = Array.from({length: 6}, (v, i) => i + 1);
             this.sticker.cute_natural_doodle = Array.from({length: 12}, (v, i) => i + 1);
             this.sticker.flower_leaf = Array.from({length: 38}, (v, i) => i + 1);
+            this.pattern.basic = Array.from({length: 9}, (v, i) => i + 1);
 
             this.canvasHeight = this.$refs.canvas.clientHeight;
             this.canvasWidth = this.$refs.canvas.clientWidth;
@@ -209,7 +230,7 @@ export default {
             } else if (type == 'sticker') {
                 let image = new fabric.Image(this.$refs[this.targetSticker][0], {
                     left: left,
-                    top: top
+                    top: top,
                 }, { crossOrigin: 'anonymous'});
                 
                 this.canvas.add(image);
@@ -220,7 +241,7 @@ export default {
         },
         saveWork() {
             this.isWork = false;
-            this.targetSticker = null,
+            this.targetSticker = null;
             // this.selectBg(this.targetColor);
             this.setWorkMode();
             this.$store.commit('setCanvas', JSON.stringify(this.canvas.toObject(['id'])));
@@ -293,9 +314,26 @@ export default {
                 this.canvas.backgroundColor = '#FFF';
             } else {
                 this.targetColor = color;
+                this.targetPattern = null;
                 this.canvas.backgroundColor = color;
             }
             
+            this.canvas.renderAll();
+        },
+        selectPattern(pattern) {
+            if (this.targetPattern == pattern) {
+                this.targetColor = '#FFF';
+                this.targetPattern = null;
+                this.canvas.backgroundColor = '#FFF';
+            } else {
+                this.targetColor = '#FFF'
+                this.targetPattern = pattern;
+
+                this.canvas.setBackgroundColor({ source: this.$refs[this.targetPattern][0].src, repeat: 'repeat' }, () => {
+                    this.canvas.renderAll();
+                });
+            }
+
             this.canvas.renderAll();
         },
     },
@@ -324,7 +362,7 @@ img {
     width: 40px;
 }
 
-.sticker {
+.sticker, .pattern {
     object-fit: contain;
     height: 40px;
     width: 40px;

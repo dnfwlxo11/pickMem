@@ -3,12 +3,12 @@
         <div class="content" style="overflow-y: auto">
             <nav-bar class="nav" :msg="msg[step]" @on-next="nextStep" @on-previous="previousStep"></nav-bar>
             <div class="body container h-75">
-                <step-one v-if="step==0"></step-one>
-                <step-two v-else-if="step==1"></step-two>
-                <step-three v-else-if="step==2"></step-three>
-                <step-four v-else-if="step==3"></step-four>
-                <step-five v-else-if="step==4"></step-five>
-                <step-result v-else @on-previous="previousStep"></step-result>
+                <step-one class="step" v-if="step==0"></step-one>
+                <step-two class="step" v-else-if="step==1"></step-two>
+                <step-three class="step" v-else-if="step==2"></step-three>
+                <step-four class="step" v-else-if="step==3"></step-four>
+                <step-five class="step" v-else-if="step==4"></step-five>
+                <step-result class="step" v-else @on-previous="previousStep" :last="true"></step-result>
             </div>
         </div>
         <footer-bar class="footer"></footer-bar>
@@ -77,17 +77,16 @@ export default {
             this.step -= 1;
         },
     },
-    computed: {
-        getClientHeight() {
-            return window.innerHeight;
-        }
-    },
 }
 </script>
 
 <style scoped>
 .body {
     margin-top: 100px;
+}
+
+.step {
+    padding-bottom: 50px;
 }
 
 .nav {
@@ -99,7 +98,6 @@ export default {
 
 .content {
     height: 100%;
-    padding-bottom: 50px;
 }
 
 .footer {
