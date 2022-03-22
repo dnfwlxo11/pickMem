@@ -7,8 +7,8 @@
         <div class="row m-0 p-0">
             <div class="col-md-8">
                 <div class="d-flex justify-content-center align-items-center">
-                    <canvas v-if="rows <= columns" :class="`decoImg`" ref="canvas" :width="450" :height="600"></canvas>
-                    <canvas v-else :class="`decoImg`" ref="canvas" :width="600" :height="450"></canvas>
+                    <canvas v-if="rows <= columns" class="decoImg-horizontal" ref="canvas" width="600" height="450"></canvas>
+                    <canvas v-else class="decoImg-vertical" ref="canvas" width="450" height="600"></canvas>
                 </div>
                 <div class="text-center">
                     <span @click="prevImg"><i class="mdi mdi-arrow-left-bold" style="font-size: 50px;"></i></span>
@@ -21,14 +21,14 @@
                 <hr>
                 <div v-if="isMode=='filter'">
                     <input type="range" min="0.0" max="1.0" step="0.01" v-model="filterVal">
-                    <div v-if="images[currImg]" class="row" style="height: 450px;overflow-y: auto;">
+                    <div v-if="images[currImg]" class="row" style="height: 600px;overflow-y: auto;">
                         <div :class="{ 'target': targetFilter == filter }" class="col-5 text-center mr-auto ml-auto mb-3 card" v-for="(obj, filter) in filters" :key="filter" @click="selectFilter(filter)">
                             <img :class="`${rows <= columns ? 'filterImg-horizontal' : 'filterImg-vertical'}`" class="pt-1 mb-2 m-auto">
                             <div>{{filter}}</div>
                         </div>
                     </div>
                 </div>
-                <div v-else-if="isMode=='sticker'" :style="`height: ${600}px;overflow-y: auto;`">
+                <div v-else-if="isMode=='sticker'" style="height: 600px;overflow-y: auto;">
                     <div v-for="(value, theme) in sticker" :key="theme">
                         <div class="mb-3"><strong>{{theme}} 테마</strong></div>
                         <div class="row m-0 p-0 mb-5">
@@ -84,7 +84,7 @@ export default {
         this.frame = this.$store.getters.getFrame;
     },
     mounted() {
-        let table = this.$store.getters.getFrame
+        let table = this.$store.getters.getFrame;
 
         this.rows = table.split('x')[0];
         this.columns = table.split('x')[1];
@@ -186,11 +186,15 @@ export default {
                 await this.loadCanvasToJSON(json);
                 
                 let backgroundImgObj = this.canvas.backgroundImage;
+                console.log(backgroundImgObj.height, backgroundImgObj.width)
+                console.log(this.canvas.width, this.canvas.height);
 
                 if (backgroundImgObj.filters.length) this.targetFilter = backgroundImgObj.filters[0].type.toLowerCase();    
                 else this.targetFilter = 'normal';
             } else {
                 const bgImg = await this.loadImgFromBase64(this.$store.getters.getTmpTarget(this.currImg));
+
+                console.log(bgImg.height, bgImg.width)
                 this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
                     scaleX: this.canvas.width / bgImg.width,
                     scaleY: this.canvas.height / bgImg.height
@@ -281,16 +285,20 @@ export default {
             this.saveWork();
         },
     },
-    computed: {
-        getContentHeight() {
-            return window.screen.availHeight;
-        }
-    },
 }
 </script>
 
 <style lang="scss" scoped>
-.decoImg {
+.decoImg-horizontal {
+    height: 450px;
+    width: 600px;
+    box-shadow: 0.5px 0.5px 1.5px black;
+    background-color: #FFF;
+}
+
+.decoImg-vertical {
+    height: 600px;
+    width: 450px;
     box-shadow: 0.5px 0.5px 1.5px black;
     background-color: #FFF;
 }

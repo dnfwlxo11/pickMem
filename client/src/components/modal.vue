@@ -22,7 +22,7 @@
           <div class="modal-footer d-block">
             <div class="row w-100 m-0 p-0">
                 <button type="button" class="btn btn-sm btn-block text-secondary col-6" @click="$emit('on-close')">
-                    <i class="mdi mdi-check"></i> 취소
+                    <i class="mdi mdi-close"></i> 취소
                 </button>
                 <button type="button" class="btn btn-sm btn-block text-success col-6" @click="$emit('on-submit')">
                     <i class="mdi mdi-check"></i> 확인

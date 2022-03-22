@@ -19,15 +19,18 @@
                 <div class="mb-3">
                     ( {{getImageLen}} / 6 )
                 </div>
-                <div v-if="getImageLen < 6 && !isShotPhoto" class="takePic d-flex justify-content-center align-items-center ml-auto mr-auto">
-                    <i class="mdi mdi-camera-outline" style="font-size: 30px;" @click="takePhoto"></i>
+                <div v-if="getImageLen < 6 && !isShotPhoto" class="d-flex justify-content-center align-items-center ml-auto mr-auto">
+                    <div v-if="isPhotoTaken">
+                        <button class="btn btn-outline-primary mr-3" @click="saveImage();isPhotoTaken=false">저   장</button>
+                        <button class="btn btn-outline-danger" @click="isPhotoTaken=false">다시찍기</button>
+                    </div>
+                    <div v-else class="takePic">
+                        <i class="mdi mdi-camera-outline" style="font-size: 30px;" @click="takePhoto"></i>
+                    </div>
                 </div>
                 <div v-else-if="getImageLen == 6" class="text-center">
                     <div class="text-center mb-2">다음 단계를 진행해주세요!</div>
                     <div><button class="btn btn-outline-danger" @click="isOpen=true;">초기화</button></div>
-                </div>
-                <div v-else class="takePic d-flex justify-content-center align-items-center ml-auto mr-auto">
-                    <i class="mdi mdi-camera" style="font-size: 30px;" @click="$Utils.toast('너무 급해요!')"></i>
                 </div>
             </div>
             <div v-else class="m-auto" style="height: 450px; width: 600px;">
@@ -110,10 +113,17 @@ export default {
     methods: {
         createCameraElement() {
             this.isLoading = true;
+            let camSize = null
+            this.rows <= this.columns ? camSize = { width: 600, height: 450 } : camSize = { width: 450, height: 600 }
+
+            console.log(camSize.width, camSize.height)
 
             const constraints = (window.constraints = {
                 audio: false,
-                video: true
+                video: {
+                    height: camSize.height,
+                    width: camSize.width,
+                },
             });
 
             navigator.mediaDevices.getUserMedia(constraints)
@@ -125,6 +135,7 @@ export default {
                 })
                 .then(stream => {
                     this.$refs.camera.srcObject = stream;
+                    console.log(stream.getTracks()[0].getSettings())
                 })
                 .catch(error => {
                     this.isLoading = false;
@@ -143,6 +154,7 @@ export default {
         takePhoto() {
             if (!this.isPhotoTaken) {
                 this.isShotPhoto = true;
+                this.isPhotoTaken = true;
 
                 const FLASH_TIMEOUT = 500;
 
@@ -153,8 +165,10 @@ export default {
 
             const context = this.$refs.canvas.getContext('2d');
 
-            this.rows <= this.columns ? context.drawImage(this.$refs.camera, 0, 0, 600, 450) : context.drawImage(this.$refs.camera, 0, 0, 450, 600)
-            this.saveImage();
+            console.log(this.$refs.camera.width, this.$refs.camera.height, 'camera');
+            console.log(this.$refs.canvas.width, this.$refs.canvas.height, 'canvas');
+
+            this.rows <= this.columns ? context.drawImage(this.$refs.camera, 0, 0, 600, 450) : context.drawImage(this.$refs.camera, 0, 0, 450, 600);
         },
 
         saveImage() {
@@ -247,6 +261,16 @@ export default {
     font-size: 30px;
     top: 0%;
     left: 0%;
+}
+
+.previewImg-horizontal {
+    height: 60;
+    width: 80;
+}
+
+.previewImg-vertical {
+    height: 80;
+    width: 60;
 }
 
 video {
