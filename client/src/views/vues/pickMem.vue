@@ -104,6 +104,7 @@ export default {
     height: 50px;
     position : relative;
     background-color: #FFF;
+    z-index: 1000;
     transform : translateY(-100%);
 }
 

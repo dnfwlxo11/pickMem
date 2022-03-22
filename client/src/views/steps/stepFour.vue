@@ -1,12 +1,17 @@
     <template>
     <div class="step-four">
-        <div class="text-center mb-3">
-            <button class="btn btn-outline-primary mr-2" @click="saveWork">저장</button>
-            <button class="btn btn-outline-primary mr-2" @click="isWork=!isWork;setWorkMode()">{{isWork ? "수정" : "관전" }}</button>
-            <button class="btn btn-outline-primary" @click="isOpen=true">미리보기</button>
-        </div>
+        <!-- <div class="text-center mb-3">
+            <button class="btn btn-outline-primary mr-2" @click="saveWork">저 장 하 기</button>         
+        </div> -->
         <div class="row m-0 p-0 mb-5">
             <div class="col-md-8 m-auto">
+                <div class="text-center mb-3">
+                    <div class="mb-2">
+                        <button class="btn btn-outline-primary mr-3" @click="isOpen=true">미 리 보 기</button>
+                        <button v-if="isWork" class="btn btn-outline-primary mr-2" @click="saveWork">저 장 하 기</button>
+                    </div>
+                    <div v-if="isWork"><strong>Delete 키로 스티커를 지울 수 있습니다.</strong></div>
+                </div>
                 <div class="mb-3 d-flex justify-content-center">
                     <div ref="pic" :class="`outter-frame-${parseInt(frame.split('x')[0])}-${parseInt(frame.split('x')[1])}`" style="position: absolute; padding: 20px; padding-right: 0px;">
                         <div :class="`row p-0 m-0`" v-for="(row, rowIdx) of rowCnt" :key="rowIdx">
@@ -26,9 +31,9 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <span @click="isMode='bg'" :class="{ 'target': isMode=='bg' }">배경색</span> | 
-                <span @click="isMode='pattern'" :class="{ 'target': isMode=='pattern' }">패턴</span> |
-                <span @click="isMode='sticker'" :class="{ 'target': isMode=='sticker' }">스티커</span>
+                <span @click="isWork=false;setWorkMode();isMode='bg'" :class="{ 'target': isMode=='bg' }">배경색</span> | 
+                <span @click="isWork=false;setWorkMode();isMode='pattern'" :class="{ 'target': isMode=='pattern' }">패턴</span> |
+                <span @click="isWork=true;setWorkMode();isMode='sticker'" :class="{ 'target': isMode=='sticker' }">스티커</span>
                 <hr>
                 <div :style="`height: 600px;overflow-y: auto;`">
                     <div v-if="isMode=='bg'">
@@ -42,13 +47,11 @@
                         </div>
                     </div>
                     <div v-else-if="isMode=='pattern'">
-                        <div>
-                            <div v-for="(value, theme) in pattern" :key="theme">
-                                <div class="mb-3"><strong>{{theme}} 테마</strong></div>
-                                <div class="row m-0 p-0 mb-5">
-                                    <div :id="`pattern_${item}`" :class="{ 'target': targetPattern == `pattern_${item}` }" class="col-3 mb-3 text-center" v-for="(item, idx) of value" :key="idx">
-                                        <img :ref="`pattern_${item}`" class="pattern" :src="require(`@/assets/pattern/pattern_${item}.png`)" @click="selectPattern(`pattern_${item}`)" draggable="false">
-                                    </div>
+                        <div v-for="(value, theme) in pattern" :key="theme">
+                            <div class="mb-3"><strong>{{theme}} 테마</strong></div>
+                            <div class="row m-0 p-0 mb-5">
+                                <div :id="`pattern_${item}`" :class="{ 'target': targetPattern == `pattern_${item}` }" class="col-3 mb-3 text-center" v-for="(item, idx) of value" :key="idx">
+                                    <img :ref="`pattern_${item}`" class="pattern" :src="require(`@/assets/pattern/pattern_${item}.png`)" @click="selectPattern(`pattern_${item}`)" draggable="false">
                                 </div>
                             </div>
                         </div>
@@ -237,11 +240,10 @@ export default {
                 this.canvas.renderAll();
 
                 this.isSticker = false;
+                this.targetSticker = null;
             }
         },
         saveWork() {
-            this.isWork = false;
-            this.targetSticker = null;
             // this.selectBg(this.targetColor);
             this.setWorkMode();
             this.$store.commit('setCanvas', JSON.stringify(this.canvas.toObject(['id'])));
@@ -303,9 +305,11 @@ export default {
             if (this.isWork) {
                 this.$refs.pic.style['z-index'] = 1;
                 this.$refs.deco.style['z-index'] = 2;
+                this.$refs.deco.style['opacity'] = 0.6;
             } else {
                 this.$refs.pic.style['z-index'] = 2;
-                this.$refs.deco.style['z-index'] = 1; 
+                this.$refs.deco.style['z-index'] = 1;
+                this.$refs.deco.style['opacity'] = 1;
             }
         },
         selectBg(color) {
@@ -319,18 +323,22 @@ export default {
             }
             
             this.canvas.renderAll();
+
+            this.saveWork();
         },
         selectPattern(pattern) {
             if (this.targetPattern == pattern) {
                 this.targetColor = '#FFF';
                 this.targetPattern = null;
                 this.canvas.backgroundColor = '#FFF';
+                this.saveWork();
             } else {
                 this.targetColor = '#FFF'
                 this.targetPattern = pattern;
 
                 this.canvas.setBackgroundColor({ source: this.$refs[this.targetPattern][0].src, repeat: 'repeat' }, () => {
                     this.canvas.renderAll();
+                    this.saveWork();
                 });
             }
 
