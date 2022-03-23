@@ -40,7 +40,7 @@
                 </div>
             </div>
         </div>
-        <preview-modal v-if="isOpen" @on-close="isOpen=false" :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></preview-modal>
+        <preview-modal v-if="isOpen" @on-close="isOpen=false" :rows="parseInt(rows)" :columns="parseInt(columns)"></preview-modal>
     </div>
 </template>
 
@@ -81,13 +81,14 @@ export default {
         }
     },
     created() {
-        this.frame = this.$store.getters.getFrame;
     },
     mounted() {
         let table = this.$store.getters.getFrame;
 
         this.rows = table.split('x')[0];
         this.columns = table.split('x')[1];
+
+        console.log(this.rows, this.columns, 'row col')
 
         this.init();
         window.addEventListener('keydown', this.setKeydownEvent);

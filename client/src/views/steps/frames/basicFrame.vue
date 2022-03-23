@@ -6,10 +6,9 @@
                     <div v-if="!images[rowIdx*colCnt.length + col]" :class="`inner-frame-${columns}-${rows}`">
                         <div class="h-100 w-100 d-flex justify-content-center align-items-center">
                             <div class="order-badge d-flex justify-content-center align-items-center">
-                                {{(orderArray.indexOf(rowIdx*colCnt.length + col) + 1) + Object.keys(images).length }}
+                                {{(orderArray.indexOf(rowIdx*colCnt.length + col) + 1) + getImageLen }}
                             </div>
                         </div>
-                        <!-- <canvas :id="`canvas-${rowIdx*colCnt.length + col}`"></canvas> -->
                     </div>
                     <div v-else :class="`inner-frame-${columns}-${rows}`">
                         <img :src="images[rowIdx*colCnt.length + col]" :id="`canvas-${rowIdx*colCnt.length + col}`" draggable="false">
@@ -52,7 +51,6 @@ export default {
     },
     methods: {
         removeImg(target) {
-            this.images[target] = null;
             this.$delete(this.images, target);
             this.$store.commit('setTargets', this.images);
             this.$store.commit('setTmpTargets', this.images);
@@ -60,6 +58,11 @@ export default {
             this.images = this.$store.getters.getTargets;
 
             if (Object.keys(this.$store.getters.getTargets).length != this.rows * this.columns) this.$store.commit('setNext', false);
+        },
+    },
+    computed: {
+        getImageLen() {
+            return Object.keys(this.images).length;
         },
     },
 }

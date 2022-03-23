@@ -56,14 +56,17 @@ export default {
         this.rows = table.split('x')[0];
         this.columns = table.split('x')[1];
 
-        this.queue = Array.from({length: this.rows * this.columns}, (v, i) => i + 1);
+        this.selectTarget = this.$store.getters.getTargets;
+        this.images = this.$store.getters.getImages;
+        this.frame = this.$store.getters.getFrame;
+
+        this.queue = Array.from({length: this.rows * this.columns}, (v, i) => { if (!this.selectTarget[i + 1]) return i + 1 });
+        this.queue = this.queue.filter(item => item);
         this.$store.commit('setUpdateQueue', this.queue);
 
         if (Object.keys(this.$store.getters.getTargets).length == this.rows * this.columns) this.$store.commit('setNext', true);
         else this.$store.commit('setNext', false);
-
-        this.images = this.$store.getters.getImages;
-        this.frame = this.$store.getters.getFrame;
+        
     },
 
     destroyed() {
