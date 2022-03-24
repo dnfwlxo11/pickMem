@@ -7,30 +7,55 @@
                     <small>카메라 설정 중</small>
                 </div>
             </div>
-            <div v-else-if="!isLoading && canPhoto" class="text-center">
-                <div v-if="rows <= columns">
-                    <video v-show="!isPhotoTaken" ref="camera" width="600" height="450" autoplay></video>
-                    <canvas v-show="isPhotoTaken" id="photoTaken" ref="canvas" width="600" height="450"></canvas>
-                </div>
-                <div v-else>
-                    <video v-show="!isPhotoTaken" ref="camera" width="450" height="600" autoplay></video>
-                    <canvas v-show="isPhotoTaken" id="photoTaken" ref="canvas" width="450" height="600"></canvas>
-                </div>
-                <div class="mb-3">
-                    ( {{getImageLen}} / 6 )
-                </div>
-                <div v-if="getImageLen < 6 && !isShotPhoto" class="d-flex justify-content-center align-items-center ml-auto mr-auto">
-                    <div v-if="isPhotoTaken">
-                        <button class="btn btn-outline-primary mr-3" @click="saveImage();isPhotoTaken=false">저   장</button>
-                        <button class="btn btn-outline-danger" @click="isPhotoTaken=false">다시찍기</button>
+            <div v-else-if="!isLoading && canPhoto" class="d-flex justify-content-center align-items-center">
+                <div v-if="rows <= columns" class="camera-horizontal camera-frame">
+                    <div>
+                        <video v-show="!isPhotoTaken" ref="camera" width="600" height="450" autoplay></video>
+                        <canvas v-show="isPhotoTaken" id="photoTaken" ref="canvas" width="600" height="450"></canvas>
                     </div>
-                    <div v-else class="takePic">
-                        <i class="mdi mdi-camera-outline" style="font-size: 30px;" @click="takePhoto"></i>
+                    <div v-if="getImageLen < 6 && !isShotPhoto" class="d-flex justify-content-center align-items-center">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div v-if="isPhotoTaken">
+                                <button class="btn btn-outline-primary mr-3" @click="saveImage();isPhotoTaken=false">저   장</button>
+                                <button class="btn btn-outline-danger" @click="isPhotoTaken=false">다시찍기</button>
+                            </div>
+                            <div v-else class="takePic d-flex justify-content-center align-items-center">
+                                <i class="mdi mdi-camera-outline" style="font-size: 30px;" @click="takePhoto"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else-if="getImageLen == 6" class="text-center">
+                        <div class="text-center mb-2">다음 단계를 진행해주세요!</div>
+                        <div><button class="btn btn-outline-danger" @click="isOpen=true;">초기화</button></div>
                     </div>
                 </div>
-                <div v-else-if="getImageLen == 6" class="text-center">
-                    <div class="text-center mb-2">다음 단계를 진행해주세요!</div>
-                    <div><button class="btn btn-outline-danger" @click="isOpen=true;">초기화</button></div>
+                <div v-else class="camera-vertical camera-frame">
+                    <div class="d-flex justify-content-center align-items-center" style="height: 50px;color: #FFF;font-size: 20px;">
+                        <div v-if="getImageLen < 6">{{6 - getImageLen}} 장 남았어요!</div>
+                        <div v-else>이제 꾸미러 가볼까요?</div>
+                    </div>
+                    <div>
+                        <video v-show="!isPhotoTaken" ref="camera" width="450" height="600" autoplay></video>
+                        <canvas v-show="isPhotoTaken" id="photoTaken" ref="canvas" width="450" height="600"></canvas>
+                    </div>
+                    <div v-if="!isShotPhoto">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div class="row m-0 p-0 w-100" style="height: 100px;">
+                                <div class="col-2 d-flex align-items-center justify-content-center"></div>
+                                <div class="col-8 d-flex align-items-center justify-content-center">
+                                    <div v-if="getImageLen < 6" class="takePic d-flex justify-content-center align-items-center" v-on="isPhotoTaken ? { click:() => { saveImage(); isPhotoTaken=false; }} : { click:() => { takePhoto(); }}">
+                                        <div class="takePic-inner"></div>
+                                    </div>
+                                    <div v-else-if="getImageLen == 6" class="takePic d-flex justify-content-center align-items-center" style="font-size: 25px;">
+                                        <i class="mdi mdi-restore" @click="isOpen=true;"></i>
+                                    </div>
+                                </div>
+                                <div class="col-2 d-flex align-items-center justify-content-center">
+                                    <i v-if="isPhotoTaken" class="mdi mdi-trash-can" style="font-size: 30px;color: #FFF;" @click="isPhotoTaken=false"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div v-else class="m-auto" style="height: 450px; width: 600px;">
@@ -55,16 +80,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="text-right">
-                        ( {{getImageLen}} / 6 )
-                    </div>
                     <div v-if="getImageLen == 6" class="text-center"><button class="btn btn-outline-danger" @click="initImage">초기화</button></div>
                 </div>
                 <div class="text-center" v-if="getImageLen < 6">카메라가 없다면 가지고 계신 사진을 6장까지 넣어주세요!</div>
                 <input ref="fileInput" @change="onImageUpload" type="file" style="display: none;" multiple>
             </div>
+            <div class="mb-3 text-center">
+                ( {{getImageLen}} / 6 )
+            </div>
         </div>
-        <modal v-if="isOpen" @on-close="isOpen=false" @on-submit="isOpen=false;initImage()"></modal>
+        <modal v-if="isOpen" @on-close="isOpen=false" @on-submit="isOpen=false;initImage()" :msg="'찍은 사진들을 모두 초기화 하시겠어요?'"></modal>
     </div>
 </template>
 
@@ -114,9 +139,7 @@ export default {
         createCameraElement() {
             this.isLoading = true;
             let camSize = null
-            this.rows <= this.columns ? camSize = { width: 600, height: 450 } : camSize = { width: 450, height: 600 }
-
-            console.log(camSize.width, camSize.height)
+            this.rows <= this.columns ? camSize = { width: 400, height: 300 } : camSize = { width: 300, height: 400 };
 
             const constraints = (window.constraints = {
                 audio: false,
@@ -135,7 +158,6 @@ export default {
                 })
                 .then(stream => {
                     this.$refs.camera.srcObject = stream;
-                    console.log(stream.getTracks()[0].getSettings())
                 })
                 .catch(error => {
                     this.isLoading = false;
@@ -164,9 +186,6 @@ export default {
             } else return;
 
             const context = this.$refs.canvas.getContext('2d');
-
-            console.log(this.$refs.camera.width, this.$refs.camera.height, 'camera');
-            console.log(this.$refs.canvas.width, this.$refs.canvas.height, 'canvas');
 
             this.rows <= this.columns ? context.drawImage(this.$refs.camera, 0, 0, 600, 450) : context.drawImage(this.$refs.camera, 0, 0, 450, 600);
         },
@@ -244,11 +263,36 @@ export default {
 </script>
 
 <style scoped>
+.camera-frame {
+    background-color: black;
+}
+
+.camera-horizontal {
+    width: 750px;
+    height: 450px;
+    box-shadow: 1px 1px 3px black;
+}
+
+.camera-vertical {
+    width: 450px;
+    height: 750px;
+    box-shadow: 1px 1px 3px black;
+}
+
 .takePic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #FFF;
+    border: 1px solid black;
+}
+
+.takePic-inner {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    box-shadow: 1px 1px 3px black;
+    background-color: #FFF;
+    border: 2px solid grey;
 }
 
 .uploadImage {
@@ -273,7 +317,7 @@ export default {
     width: 60;
 }
 
-video {
+canvas, video {
     object-fit: cover;
 }
 

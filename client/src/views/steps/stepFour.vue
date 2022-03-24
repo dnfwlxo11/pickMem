@@ -133,7 +133,6 @@ export default {
         this.frame = this.$store.getters.getFrame;
     },
     mounted() {
-        
         this.init();
         window.addEventListener('keydown', this.setKeydownEvent);
     },

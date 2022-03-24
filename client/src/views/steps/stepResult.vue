@@ -1,6 +1,6 @@
 <template>
     <div class="step-result">
-        <div class="text-center">
+        <div class="text-center mb-3">
             <button class="btn btn-outline-primary mr-3" @click="saveResult">저 장 하 기</button>
             <button class="btn btn-outline-primary" @click="$router.push('/')">다 시 하 기</button>
         </div>
@@ -36,7 +36,7 @@ export default {
     methods: {
         async saveResult() {
             let result = await html2canvas(this.$refs.result);
-            result.style.backgroundColor = '#FFFFFF'
+            result.style.backgroundColor = '#FFF'
 
             let a = document.createElement("a");
             a.href = result.toDataURL();
@@ -49,47 +49,45 @@ export default {
 
 <style lang="scss" scoped>
 .outter-frame {
-    padding: 20px;
-
     &-1-1 {
-        height: 390px;
-        width: 440px;
+        height: 350px;
+        width: 400px;
     }
     &-1-2 {
-        height: 560px;
-        width: 360px;
+        height: 520px;
+        width: 320px;
     }
     &-1-3 {
-        height: 565px;
-        width: 260px;
-    }
-    &-1-4 {
-        height: 600px;
+        height: 525px;
         width: 220px;
     }
+    &-1-4 {
+        height: 560px;
+        width: 180px;
+    }
     &-2-1 {
-        height: 360px;
-        width: 560px;
+        height: 320px;
+        width: 520px;
     }
     &-2-2 {
-        height: 560px;
-        width: 660px;
+        height: 520px;
+        width: 620px;
     }
     &-2-3 {
-        height: 565px;
-        width: 460px;
+        height: 525px;
+        width: 420px;
     }
     &-3-1 {
-        height: 260px;
-        width: 565px;
+        height: 220px;
+        width: 525px;
     }
     &-3-2 {
-        height: 460px;
-        width: 565px;
+        height: 420px;
+        width: 525px;
     }
     &-4-1 {
-        height: 220px;
-        width: 600px;
+        height: 180px;
+        width: 560px;
     }
 }
 </style>

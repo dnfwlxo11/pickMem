@@ -7,7 +7,7 @@
         <div class="row m-0 p-0">
             <div class="col-md-8">
                 <div class="d-flex justify-content-center align-items-center">
-                    <canvas v-if="rows <= columns" class="decoImg-horizontal" ref="canvas" width="600" height="450"></canvas>
+                    <canvas v-if="parseInt(frame.split('x')[0]) <= parseInt(frame.split('x')[1])" class="decoImg-horizontal" ref="canvas" width="600" height="450"></canvas>
                     <canvas v-else class="decoImg-vertical" ref="canvas" width="450" height="600"></canvas>
                 </div>
                 <div class="text-center">
@@ -23,7 +23,7 @@
                     <input type="range" min="0.0" max="1.0" step="0.01" v-model="filterVal">
                     <div v-if="images[currImg]" class="row" style="height: 600px;overflow-y: auto;">
                         <div :class="{ 'target': targetFilter == filter }" class="col-5 text-center mr-auto ml-auto mb-3 card" v-for="(obj, filter) in filters" :key="filter" @click="selectFilter(filter)">
-                            <img :class="`${rows <= columns ? 'filterImg-horizontal' : 'filterImg-vertical'}`" class="pt-1 mb-2 m-auto">
+                            <img :class="`${parseInt(frame.split('x')[0]) <= parseInt(frame.split('x')[1]) ? 'filterImg-horizontal' : 'filterImg-vertical'}`" class="pt-1 mb-2 m-auto">
                             <div>{{filter}}</div>
                         </div>
                     </div>
@@ -40,7 +40,7 @@
                 </div>
             </div>
         </div>
-        <preview-modal v-if="isOpen" @on-close="isOpen=false" :rows="parseInt(rows)" :columns="parseInt(columns)"></preview-modal>
+        <preview-modal v-if="isOpen" @on-close="isOpen=false" :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></preview-modal>
     </div>
 </template>
 
@@ -81,14 +81,9 @@ export default {
         }
     },
     created() {
+        this.frame = this.$store.getters.getFrame;
     },
     mounted() {
-        let table = this.$store.getters.getFrame;
-
-        this.rows = table.split('x')[0];
-        this.columns = table.split('x')[1];
-
-        console.log(this.rows, this.columns, 'row col')
 
         this.init();
         window.addEventListener('keydown', this.setKeydownEvent);

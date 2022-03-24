@@ -1,14 +1,14 @@
 <template>
     <div class="pick-mem h-100">
         <div class="content" style="overflow-y: auto">
-            <nav-bar class="nav" :msg="msg[step]" @on-next="nextStep" @on-previous="previousStep"></nav-bar>
+            <nav-bar class="nav" :msg="msg[step]" @on-next="nextStep" @on-previous="previousStep" :step="step"></nav-bar>
             <div class="body container h-75">
                 <step-one class="step" v-if="step==0"></step-one>
                 <step-two class="step" v-else-if="step==1"></step-two>
                 <step-three class="step" v-else-if="step==2"></step-three>
                 <step-four class="step" v-else-if="step==3"></step-four>
                 <step-five class="step" v-else-if="step==4"></step-five>
-                <step-result class="step" v-else @on-previous="previousStep" :last="true"></step-result>
+                <step-result class="step" v-else @on-previous="previousStep"></step-result>
             </div>
         </div>
         <footer-bar class="footer"></footer-bar>
