@@ -88,6 +88,9 @@ export default {
         this.init();
         window.addEventListener('keydown', this.setKeydownEvent);
     },
+    beforeDestroy() {
+        this.saveWork();
+    },
     destroyed() {
         window.removeEventListener('keydown', this.setKeydownEvent);
     },
@@ -164,7 +167,7 @@ export default {
 
             this.currImg -= 1;
 
-            await this.loadImgCanvas();            
+            await this.loadImgCanvas();
         },
 
         async nextImg() {
@@ -182,25 +185,23 @@ export default {
                 await this.loadCanvasToJSON(json);
                 
                 let backgroundImgObj = this.canvas.backgroundImage;
-                console.log(backgroundImgObj.height, backgroundImgObj.width)
-                console.log(this.canvas.width, this.canvas.height);
 
                 if (backgroundImgObj.filters.length) this.targetFilter = backgroundImgObj.filters[0].type.toLowerCase();    
                 else this.targetFilter = 'normal';
             } else {
                 const bgImg = await this.loadImgFromBase64(this.$store.getters.getTmpTarget(this.currImg));
 
-                console.log(bgImg.height, bgImg.width)
                 this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
                     scaleX: this.canvas.width / bgImg.width,
                     scaleY: this.canvas.height / bgImg.height
                 });
 
+                this.targetFilter = 'normal';
                 this.canvas.backgroundColor = '#FFFFFF';
                 this.canvas.renderAll();
 
                 this.$store.commit('setImgCanvas', [this.currImg, JSON.stringify(this.canvas.toObject(['id']))]);
-            }            
+            }
         },
 
         loadCanvasToJSON(json) {
@@ -241,15 +242,17 @@ export default {
 
         async selectFilter(target) {
             if (this.targetFilter == target || target == 'normal') {
-                this.targetFilter = 'normal'
                 const bgImg = await this.loadImgFromBase64(this.$store.getters.getTmpTarget(this.currImg));
+
+                this.targetFilter = 'normal';
                 this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
                     scaleX: this.canvas.width / bgImg.width,
                     scaleY: this.canvas.height / bgImg.height
                 })
             } else {
-                this.targetFilter = target
                 const bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
+
+                this.targetFilter = target;
                 bgImg.filters = [this.filters[this.targetFilter]];
                 bgImg.applyFilters();
                 this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {

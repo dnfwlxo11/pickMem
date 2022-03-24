@@ -1,8 +1,9 @@
 <template>
     <div class="pick-mem h-100">
-        <div class="content" style="overflow-y: auto">
+        <div class="content" style="overflow-y: auto;">
             <nav-bar class="nav" :msg="msg[step]" @on-next="nextStep" @on-previous="previousStep" :step="step"></nav-bar>
-            <div class="body container h-75">
+             <!-- style="height: calc(100% - 150px);" -->
+            <div class="body container">
                 <step-one class="step" v-if="step==0"></step-one>
                 <step-two class="step" v-else-if="step==1"></step-two>
                 <step-three class="step" v-else-if="step==2"></step-three>

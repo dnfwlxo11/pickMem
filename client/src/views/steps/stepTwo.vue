@@ -10,8 +10,8 @@
             <div v-else-if="!isLoading && canPhoto" class="d-flex justify-content-center align-items-center">
                 <div v-if="rows <= columns" class="camera-horizontal camera-frame">
                     <div class="col-custom h-100 text-center d-flex align-items-center justify-content-center" style="width: 50px;color: #FFF;font-size: 20px;">
-                        <div v-if="getImageLen < 6">{{6 - getImageLen}}<br>장<br>남<br>았<br>어<br>요<br>!</div>
-                        <div v-else>이<br>제<br>꾸<br>미<br>러<br>가<br>볼<br>까<br>요<br>?</div>
+                        <div v-if="getImageLen < 6">{{6 - getImageLen}}<br>장<br><br>남<br>았<br>어<br>요<br>!</div>
+                        <div v-else>이<br>제<br><br>꾸<br>미<br>러<br><br>가<br>볼<br>까<br>요<br>?</div>
                     </div>
                     <div class="col-custom">
                         <video v-show="!isPhotoTaken" ref="camera" width="600" height="450" autoplay></video>
@@ -48,11 +48,11 @@
                             <div class="row m-0 p-0 w-100" style="height: 100px;">
                                 <div class="col-2"></div>
                                 <div class="col-8 d-flex align-items-center justify-content-center">
-                                    <div v-if="getImageLen < 6" class="takePic d-flex justify-content-center align-items-center" v-on="isPhotoTaken ? { click:() => { saveImage(); isPhotoTaken=false; }} : { click:() => { takePhoto(); }}">
-                                        <div class="takePic-inner"></div>
-                                    </div>
-                                    <div v-else-if="getImageLen == 6" class="takePic d-flex justify-content-center align-items-center" style="font-size: 25px;">
+                                    <div v-if="getImageLen == 6" class="takePic d-flex justify-content-center align-items-center" style="font-size: 25px;">
                                         <i class="mdi mdi-restore" @click="isOpen=true;"></i>
+                                    </div>
+                                    <div v-else class="takePic d-flex justify-content-center align-items-center" v-on="isPhotoTaken ? { click:() => { saveImage(); isPhotoTaken=false; }} : { click:() => { takePhoto(); }}">
+                                        <div class="takePic-inner"></div>
                                     </div>
                                 </div>
                                 <div class="col-2 d-flex align-items-center justify-content-center">
@@ -91,7 +91,7 @@
                 <input ref="fileInput" @change="onImageUpload" type="file" style="display: none;" multiple>
             </div>
         </div>
-        <modal v-if="isOpen" @on-close="isOpen=false" @on-submit="isOpen=false;initImage()" :msg="'찍은 사진들을 모두 초기화 하시겠어요?'"></modal>
+        <modal v-if="isOpen" @on-close="isOpen=false" @on-submit="isOpen=false;initImage()" :title="'사진 삭제'" :msg="'찍은 사진들을 모두 초기화 하시겠어요?'"></modal>
     </div>
 </template>
 
@@ -177,14 +177,7 @@ export default {
 
         takePhoto() {
             if (!this.isPhotoTaken) {
-                this.isShotPhoto = true;
                 this.isPhotoTaken = true;
-
-                const FLASH_TIMEOUT = 500;
-
-                setTimeout(() => {
-                    this.isShotPhoto = false;
-                }, FLASH_TIMEOUT);
             } else return;
 
             const context = this.$refs.canvas.getContext('2d');

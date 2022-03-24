@@ -1,6 +1,6 @@
 <template>
     <div class="step-three">
-        <div class="row p-0 m-0 align-items-center">
+        <div class="row p-0 m-0 h-100 align-items-center">
             <div class="col-md-8">
                 <div class="d-flex justify-content-center mb-3">
                     <basic-frame v-if="frame" :columns="parseInt(frame.split('x')[0])" :rows="parseInt(frame.split('x')[1])"></basic-frame>
@@ -100,6 +100,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.list-horizontal {
+    width: 200px;
+}
+
+.list-vertical {
+    width: 150px;
+}
+
 .previewImg-horizontal {
     height: 150px;
     width: 200px;

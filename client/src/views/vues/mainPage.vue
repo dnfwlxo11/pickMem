@@ -18,14 +18,7 @@ export default {
     },
     methods: {
         init() {
-            this.$store.commit('setFrame', null);
-            this.$store.commit('setFrameImg', null);
-            this.$store.commit('setCanvas', null);
-            this.$store.commit('setImages', {});
-            this.$store.commit('setTargets', {});
-            this.$store.commit('setTmpTargets', {});
-            this.$store.commit('setImgCanvas', {});
-            this.$store.commit('setUpdateQueue', []);
+            this.$store.commit('resetState');
         }
     }
 }

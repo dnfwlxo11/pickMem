@@ -56,10 +56,10 @@
 <style lang="scss" scoped>
   .modal-container {
     max-width: 300px;
+    margin-top: calc(50%);
   }
 
   .modal {
-    margin-top: 300px;
 
     &-mask {
       position: fixed;

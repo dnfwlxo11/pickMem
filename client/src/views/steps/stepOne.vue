@@ -105,12 +105,7 @@ export default {
             this.$store.commit('setFrame', this.targetFrame);
         },
         init() {
-            this.$store.commit('setFrameImg', null);
-            this.$store.commit('setImages', {});
-            this.$store.commit('setTargets', {});
-            this.$store.commit('setTmpTargets', {});
-            this.$store.commit('setImgCanvas', {});
-            this.$store.commit('setUpdateQueue', []);
+            this.$store.commit('resetState');
         },
     }
 }

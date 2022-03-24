@@ -1,8 +1,5 @@
     <template>
     <div class="step-four">
-        <!-- <div class="text-center mb-3">
-            <button class="btn btn-outline-primary mr-2" @click="saveWork">저 장 하 기</button>         
-        </div> -->
         <div class="row m-0 p-0 mb-5">
             <div class="col-md-8 m-auto">
                 <div class="text-center mb-3">
@@ -327,9 +324,9 @@ export default {
         },
         selectPattern(pattern) {
             if (this.targetPattern == pattern) {
+                this.canvas.backgroundColor = '#FFF';
                 this.targetColor = '#FFF';
                 this.targetPattern = null;
-                this.canvas.backgroundColor = '#FFF';
                 this.saveWork();
             } else {
                 this.targetColor = '#FFF'

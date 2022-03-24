@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
-export default new Vuex.Store({
-  state: {
+const getDefaultState = () => {
+  return {
     canNext: false,
     rows: 2,
     columns: 1,
@@ -16,7 +16,13 @@ export default new Vuex.Store({
     selectTarget: {},
     tmpTarget: {},
     orderQueue: [],
-  },
+  };
+};
+
+const state = getDefaultState();
+
+export default new Vuex.Store({
+  state: state,
   mutations: {
     setNext(state, val) {
       state.canNext = val;
@@ -57,6 +63,9 @@ export default new Vuex.Store({
     setTable(state, table) {
       state.rows = table.rows;
       state.columns = table.columns;
+    },
+    resetState(state) {
+      Object.assign(state, getDefaultState());
     }
   },
   getters: {
@@ -103,5 +112,5 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
-  }
+  },
 })

@@ -54,7 +54,7 @@
 <style lang="scss" scoped>
   .modal-container {
     max-width: 640px;
-    margin-top: 100px;
+    margin-top: calc(50%);
   }
 
   .modal {
