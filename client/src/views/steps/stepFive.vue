@@ -318,14 +318,4 @@ export default {
     height: 40px;
     width: 40px;
 }
-
-// .blur { filter: blur(1px); }
-// .brightness { filter: brightness(0.50); }
-// .contrast { filter: contrast(180%); }
-// .grayscale { filter: grayscale(100%); }
-// .huerotate { filter: hue-rotate(180deg); }
-// .invert { filter: invert(100%); }
-// .opacity { filter: opacity(50%); }
-// .saturate { filter: saturate(7); }
-// .sepia { filter: sepia(100%); }
 </style>

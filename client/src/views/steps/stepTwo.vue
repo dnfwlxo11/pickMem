@@ -9,24 +9,29 @@
             </div>
             <div v-else-if="!isLoading && canPhoto" class="d-flex justify-content-center align-items-center">
                 <div v-if="rows <= columns" class="camera-horizontal camera-frame">
-                    <div>
+                    <div class="col-custom h-100 text-center d-flex align-items-center justify-content-center" style="width: 50px;color: #FFF;font-size: 20px;">
+                        <div v-if="getImageLen < 6">{{6 - getImageLen}}<br>장<br>남<br>았<br>어<br>요<br>!</div>
+                        <div v-else>이<br>제<br>꾸<br>미<br>러<br>가<br>볼<br>까<br>요<br>?</div>
+                    </div>
+                    <div class="col-custom">
                         <video v-show="!isPhotoTaken" ref="camera" width="600" height="450" autoplay></video>
                         <canvas v-show="isPhotoTaken" id="photoTaken" ref="canvas" width="600" height="450"></canvas>
                     </div>
-                    <div v-if="getImageLen < 6 && !isShotPhoto" class="d-flex justify-content-center align-items-center">
-                        <div class="d-flex justify-content-center align-items-center">
-                            <div v-if="isPhotoTaken">
-                                <button class="btn btn-outline-primary mr-3" @click="saveImage();isPhotoTaken=false">저   장</button>
-                                <button class="btn btn-outline-danger" @click="isPhotoTaken=false">다시찍기</button>
+                    <div v-if="!isShotPhoto" class="col-custom" style="width: 100px;">
+                        <div class="w-100">
+                            <div class="d-flex justify-content-center align-items-center" style="height: 75px">
+                                <i v-if="isPhotoTaken" class="mdi mdi-trash-can" style="font-size: 30px;color: #FFF;" @click="isPhotoTaken=false"></i>
                             </div>
-                            <div v-else class="takePic d-flex justify-content-center align-items-center">
-                                <i class="mdi mdi-camera-outline" style="font-size: 30px;" @click="takePhoto"></i>
+                            <div class="d-flex justify-content-center align-items-center" style="height: 300px;">
+                                <div v-if="getImageLen < 6" class="takePic d-flex justify-content-center align-items-center" v-on="isPhotoTaken ? { click:() => { saveImage(); isPhotoTaken=false; }} : { click:() => { takePhoto(); }}">
+                                    <div class="takePic-inner"></div>
+                                </div>
+                                <div v-else-if="getImageLen == 6" class="takePic d-flex justify-content-center align-items-center" style="font-size: 25px;">
+                                    <i class="mdi mdi-restore" @click="isOpen=true;"></i>
+                                </div>
                             </div>
+                            <div style="height: 75px;"></div>
                         </div>
-                    </div>
-                    <div v-else-if="getImageLen == 6" class="text-center">
-                        <div class="text-center mb-2">다음 단계를 진행해주세요!</div>
-                        <div><button class="btn btn-outline-danger" @click="isOpen=true;">초기화</button></div>
                     </div>
                 </div>
                 <div v-else class="camera-vertical camera-frame">
@@ -41,7 +46,7 @@
                     <div v-if="!isShotPhoto">
                         <div class="d-flex justify-content-center align-items-center">
                             <div class="row m-0 p-0 w-100" style="height: 100px;">
-                                <div class="col-2 d-flex align-items-center justify-content-center"></div>
+                                <div class="col-2"></div>
                                 <div class="col-8 d-flex align-items-center justify-content-center">
                                     <div v-if="getImageLen < 6" class="takePic d-flex justify-content-center align-items-center" v-on="isPhotoTaken ? { click:() => { saveImage(); isPhotoTaken=false; }} : { click:() => { takePhoto(); }}">
                                         <div class="takePic-inner"></div>
@@ -84,9 +89,6 @@
                 </div>
                 <div class="text-center" v-if="getImageLen < 6">카메라가 없다면 가지고 계신 사진을 6장까지 넣어주세요!</div>
                 <input ref="fileInput" @change="onImageUpload" type="file" style="display: none;" multiple>
-            </div>
-            <div class="mb-3 text-center">
-                ( {{getImageLen}} / 6 )
             </div>
         </div>
         <modal v-if="isOpen" @on-close="isOpen=false" @on-submit="isOpen=false;initImage()" :msg="'찍은 사진들을 모두 초기화 하시겠어요?'"></modal>
@@ -262,7 +264,21 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss"  scoped>
+.col-custom {
+    float: left;
+
+    &-50 {
+        width: 50px;
+    }
+    &-100 {
+        width: 100px;
+    }
+    &-600 {
+        width: 100px;
+    }
+}
+
 .camera-frame {
     background-color: black;
 }
