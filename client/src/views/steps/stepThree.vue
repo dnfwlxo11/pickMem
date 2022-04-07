@@ -15,7 +15,7 @@
                     <hr>
                     <div class="images text-center">
                         <div class="mb-3" v-for="(value, id) in images" :key="id">
-                            <img :class="`mr-3 ${rows <= columns ? 'previewImg-horizontal' : 'previewImg-vertical'}`" :src="value" alt="" :id="`${id}`" @click="selectToClick(value)" draggable="false">
+                            <img :class="`mr-3 ${getSelectList.includes(id) ? 'selected' : ''} ${rows <= columns ? 'previewImg-horizontal' : 'previewImg-vertical'}`" :src="value" alt="" :id="`${id}`" @click="selectToClick(id, value)" draggable="false">
                             <hr>
                         </div>
                     </div>
@@ -42,6 +42,7 @@ export default {
             width: 500,
             images: {},
             selectTarget: {},
+            selectList: [],
             frame: null,
             queue: [],
         }
@@ -57,6 +58,7 @@ export default {
         this.columns = table.split('x')[1];
 
         this.selectTarget = this.$store.getters.getTargets;
+        this.selectList = this.$store.getters.getTargetList;
         this.images = this.$store.getters.getImages;
         this.frame = this.$store.getters.getFrame;
 
@@ -74,7 +76,23 @@ export default {
     },
 
     methods: {
-        selectToClick(src) {
+        selectToClick(id, src) {
+            console.log(id, src)
+            console.log(this.getSelectList, 'selectList')
+            console.log(this.selectTarget, 'selectTarget')
+            if (this.getSelectList.includes(id)) {
+                let idx = this.selectList.indexOf(id);
+                console.log(idx)
+                this.selectList.splice(idx, 1);
+                this.$delete(this.selectTarget, idx + 1);
+                this.$store.commit('setTargetList', this.selectList);
+                this.$store.commit('setTargets', this.selectTarget);
+                this.$store.commit('setTmpTargets', this.selectTarget);
+                this.$store.commit('setRemoveQueue', idx + 1);
+                console.log(this.selectTarget)
+                return;
+            }
+
             this.selectTarget = this.$store.getters.getTargets;
             let table = this.frame.split('x');
 
@@ -83,11 +101,16 @@ export default {
                 return;
             } else {
                 this.queue = this.$store.getters.getRemoveQueues;
+                this.selectList.push(id);
+
                 let recoverKey = this.queue.shift();
+
+                console.log(this.queue, 'after')
 
                 this.$store.commit('setUpdateQueue', this.queue);
                 this.$store.commit('setTarget', [recoverKey, src]);
                 this.$store.commit('setTmpTarget', [recoverKey, src]);
+                this.$store.commit('setTargetList', this.selectList);
 
                 this.selectTarget = this.$store.getters.getTargets;
             }
@@ -95,6 +118,12 @@ export default {
             if (Object.keys(this.$store.getters.getTargets).length == this.rows * this.columns) this.$store.commit('setNext', true);
             else this.$store.commit('setNext', false);
         },
+    },
+    computed: {
+        getSelectList() {
+            console.log(this.selectList);
+            return this.selectList;
+        }
     },
 }
 </script>
@@ -123,5 +152,10 @@ export default {
     overflow-y: scroll;
     overflow-x: hidden;
     white-space: nowrap;
+}
+
+.selected {
+    background-color: grey;
+    opacity: 0.7;
 }
 </style>

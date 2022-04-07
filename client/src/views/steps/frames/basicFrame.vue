@@ -55,6 +55,7 @@ export default {
             this.$store.commit('setTargets', this.images);
             this.$store.commit('setTmpTargets', this.images);
             this.$store.commit('setRemoveQueue', target);
+            this.$store.commit('setTargetListRemove', target);
             this.images = this.$store.getters.getTargets;
 
             if (Object.keys(this.$store.getters.getTargets).length != this.rows * this.columns) this.$store.commit('setNext', false);
