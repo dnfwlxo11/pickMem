@@ -77,21 +77,7 @@ export default {
 
     methods: {
         selectToClick(id, src) {
-            console.log(id, src)
-            console.log(this.getSelectList, 'selectList')
-            console.log(this.selectTarget, 'selectTarget')
-            if (this.getSelectList.includes(id)) {
-                let idx = this.selectList.indexOf(id);
-                console.log(idx)
-                this.selectList.splice(idx, 1);
-                this.$delete(this.selectTarget, idx + 1);
-                this.$store.commit('setTargetList', this.selectList);
-                this.$store.commit('setTargets', this.selectTarget);
-                this.$store.commit('setTmpTargets', this.selectTarget);
-                this.$store.commit('setRemoveQueue', idx + 1);
-                console.log(this.selectTarget)
-                return;
-            }
+            if (this.getSelectList.includes(id)) return;
 
             this.selectTarget = this.$store.getters.getTargets;
             let table = this.frame.split('x');
@@ -104,8 +90,6 @@ export default {
                 this.selectList.push(id);
 
                 let recoverKey = this.queue.shift();
-
-                console.log(this.queue, 'after')
 
                 this.$store.commit('setUpdateQueue', this.queue);
                 this.$store.commit('setTarget', [recoverKey, src]);

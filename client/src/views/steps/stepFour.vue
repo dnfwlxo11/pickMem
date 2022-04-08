@@ -19,7 +19,7 @@
                             </div>
                         </div>
                     </div>
-                    <div ref="deco">
+                    <div ref="deco" @drop="drop" @dragover.prevent>
                         <canvas v-if="frame" :class="`outter-frame outter-frame-${parseInt(frame.split('x')[0])}-${parseInt(frame.split('x')[1])}`" ref="canvas"></canvas>
                     </div>
                 </div>
@@ -63,7 +63,7 @@
                                 <div class="mb-3"><strong>{{theme}} 테마</strong></div>
                                 <div class="row m-0 p-0 mb-5">
                                     <div :id="`${theme}_${item}`" :class="{ 'target': targetSticker == `${theme}_${item}` }" class="col-3 mb-3 text-center" v-for="(item, idx) of value" :key="idx" @click="isSticker=!isSticker;selectSticker(`${theme}_${item}`)">
-                                        <img :ref="`${theme}_${item}`" class="sticker" :src="require(`@/assets/stickers/${theme}_${item}.png`)" draggable="false">
+                                        <img :ref="`${theme}_${item}`" class="sticker" :src="require(`@/assets/stickers/${theme}_${item}.png`)">
                                     </div>
                                 </div>
                             </div>
@@ -184,10 +184,11 @@ export default {
                 } else if (this.isSticker) {
                     this.createObj('sticker', e.pointer.x, e.pointer.y);
                 } else if (e.target) {
-                    e.target.opacity = 0.5;
+                    // e.target.opacity = 0.8;
                     this.canvas.renderAll();
                 }
             }).on('mouse:up', (e) => {
+                console.log(e.pointer)
                 if (e.target) {
                     e.target.opacity = 1;
                     this.canvas.renderAll();
@@ -227,13 +228,33 @@ export default {
 
                 this.isText = false;
             } else if (type == 'sticker') {
-                let image = new fabric.Image(this.$refs[this.targetSticker][0], {
+                const sticker = this.$refs[this.targetSticker][0]
+                let image = new fabric.Image(sticker, {
                     left: left,
                     top: top,
                 }, { crossOrigin: 'anonymous'});
                 
+                image.left = left - (image.width / 2);
+                image.top = top - (image.height / 2);
+
                 this.canvas.add(image);
                 this.canvas.renderAll();
+
+                this.isSticker = false;
+                this.targetSticker = null;
+            }
+        },
+        createDragObj(type, target, left, top) {
+            if (type == 'sticker') {
+                fabric.Image.fromURL(target,  (img) => {
+                    img.left = left - (img.width / 2);
+                    img.top = top - (img.height / 2);
+
+                    this.canvas.add(img);
+                    this.canvas.renderAll();
+                }, { crossOrigin: 'anonymous'});
+                
+                this.canvas.discardActiveObject().renderAll();
 
                 this.isSticker = false;
                 this.targetSticker = null;
@@ -301,7 +322,7 @@ export default {
             if (this.isWork) {
                 this.$refs.pic.style['z-index'] = 1;
                 this.$refs.deco.style['z-index'] = 2;
-                this.$refs.deco.style['opacity'] = 0.6;
+                this.$refs.deco.style['opacity'] = 0.8;
             } else {
                 this.$refs.pic.style['z-index'] = 2;
                 this.$refs.deco.style['z-index'] = 1;
@@ -340,6 +361,12 @@ export default {
 
             this.canvas.renderAll();
         },
+
+        drop(e) {
+            const dragImg = e.dataTransfer.getData('text/plain')
+            this.createDragObj('sticker', dragImg, e.offsetX, e.offsetY)
+        },
+
     },
     computed: {
         getContentHeight() {
