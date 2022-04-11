@@ -19,7 +19,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <span :class="{ 'target': isMode=='filter' }" class="p-2" @click="isDraw=false;setDrawMode();isMode='filter'">필터</span> | <span :class="{ 'target': isMode=='sticker' }" class="p-2" @click="isDraw=false;setDrawMode();isMode='sticker'">스티커</span> | <span :class="{ 'target': isMode=='draw' }" class="p-2" @click="isDraw=true;setDrawMode();isMode='draw'">그리기</span>
+                <span :class="{ 'target': isMode=='filter' }" class="p-2" @click="isDraw=false;setDrawMode();canvas.isDrawingMode=0;isMode='filter'">필터</span> | <span :class="{ 'target': isMode=='sticker' }" class="p-2" @click="isDraw=false;setDrawMode();canvas.isDrawingMode=0;isMode='sticker'">스티커</span> | <span :class="{ 'target': isMode=='draw' }" class="p-2" @click="isDraw=true;setDrawMode();canvas.isDrawingMode=1;isMode='draw'">그리기</span>
                 <hr>
                 <div v-if="isMode=='filter'">
                     <input type="range" min="0.0" max="1.0" step="0.01" v-model="filterVal">
@@ -142,14 +142,9 @@ export default {
             this.canvas.on('mouse:down', (e) => {
                 if (this.isSticker) {
                     this.createObj('sticker', e.pointer.x, e.pointer.y);
-                } else if (this.isDraw) {
-                    // this.isDrawing = true;
                 }
             }).on('mouse:up', (e) => {
-                if (this.isDraw) {
-                    // this.isDrawing = false;
-                    // this.saveWork();
-                } else if (e.target) {
+                if (e.target) {
                     e.target.opacity = 1;
                     this.canvas.renderAll();
                 }
@@ -338,12 +333,12 @@ export default {
         initFreeDrawBrush() {
             this.canvas.freeDrawingBrush.color = '#000';
             this.canvas.freeDrawingBrush.width = 10;
-            this.canvas.isDrawingBrush = 1;
+            // this.canvas.isDrawingMode = 1;
             this.canvas.renderAll();
         },
 
         setDrawMode() {
-            this.canvas.selectable = this.isDraw;
+            // this.canvas.selectable = this.isDraw;
             this.canvas.renderAll();
         },
     },
