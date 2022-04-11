@@ -37,7 +37,7 @@
                         <div v-for="(value, theme) in bg" :key="theme">
                             <div class="mb-3"><strong>{{theme}} 테마</strong></div>
                             <div class="row m-0 p-0 mb-3">
-                                <div :class="{ 'target': targetColor == color }" class="col-2 m-0 p-0 pt-1 pb-1" v-for="(color, idx) of value" :key="idx">
+                                <div :class="{ 'target': targetColor == color }" class="col-md-2 m-0 p-0 pt-1 pb-1" v-for="(color, idx) of value" :key="idx">
                                     <div class="bg m-auto" :style="{'background-color': color}" @click="selectBg(color)"></div>
                                 </div>
                             </div>
@@ -171,6 +171,7 @@ export default {
         },
         loadCanvasToJSON() {
             return new Promise((resolve, reject) => {
+                console.log(JSON.parse(this.$store.getters.getCanvas))
                 this.canvas.loadFromJSON(this.$store.getters.getCanvas, this.canvas.renderAll.bind(this.canvas));
                 resolve();
             })
@@ -232,7 +233,11 @@ export default {
                 let image = new fabric.Image(sticker, {
                     left: left,
                     top: top,
-                }, { crossOrigin: 'anonymous'});
+                    borderColor: 'red',
+                    cornerColor: 'green',
+                    cornerSize: 10,
+                    transparentCorners: false,
+                });
                 
                 image.left = left - (image.width / 2);
                 image.top = top - (image.height / 2);
@@ -249,10 +254,14 @@ export default {
                 fabric.Image.fromURL(target,  (img) => {
                     img.left = left - (img.width / 2);
                     img.top = top - (img.height / 2);
+                    img.borderColor = 'red',
+                    img.cornerColor = 'green',
+                    img.cornerSize = 10,
+                    img.transparentCorners = false,
 
                     this.canvas.add(img);
                     this.canvas.renderAll();
-                }, { crossOrigin: 'anonymous'});
+                });
                 
                 this.canvas.discardActiveObject().renderAll();
 
@@ -263,7 +272,7 @@ export default {
         saveWork() {
             // this.selectBg(this.targetColor);
             this.setWorkMode();
-            this.$store.commit('setCanvas', JSON.stringify(this.canvas.toObject(['id'])));
+            this.$store.commit('setCanvas', JSON.stringify(this.canvas.toObject(['id', 'borderColor', 'cornerColor', 'cornerSize', 'transparentCorners'])));
             this.$store.commit('setFrameImg', this.canvas.toDataURL({ format: 'image/png' }));
         },
         setTextEvent(textBox) {
@@ -366,7 +375,6 @@ export default {
             const dragImg = e.dataTransfer.getData('text/plain')
             this.createDragObj('sticker', dragImg, e.offsetX, e.offsetY)
         },
-
     },
     computed: {
         getContentHeight() {

@@ -6,7 +6,7 @@
         </div>
         <div class="row m-0 p-0">
             <div class="col-md-8">
-                <div class="d-flex justify-content-center align-items-center">
+                <div class="d-flex justify-content-center align-items-center" @drop="drop" @dragover.prevent>
                     <canvas v-if="parseInt(frame.split('x')[0]) <= parseInt(frame.split('x')[1])" class="decoImg-horizontal" ref="canvas" width="600" height="450"></canvas>
                     <canvas v-else class="decoImg-vertical" ref="canvas" width="450" height="600"></canvas>
                 </div>
@@ -217,7 +217,7 @@ export default {
             return new Promise((resolve, reject) => {
                 fabric.Image.fromURL(base64, (image) => {
                     resolve(image);
-                }, { crossOrigin: 'anonymous'})
+                })
             });
         },
 
@@ -228,10 +228,34 @@ export default {
                     top: top
                 });
                 
+                image.left = left - (image.width / 2);
+                image.top = top - (image.height / 2);
+
                 this.canvas.add(image);
                 this.canvas.renderAll();
 
                 this.isSticker = false;
+            }
+        },
+
+        createDragObj(type, target, left, top) {
+            if (type == 'sticker') {
+                fabric.Image.fromURL(target,  (img) => {
+                    img.left = left - (img.width / 2);
+                    img.top = top - (img.height / 2);
+                    img.borderColor = 'red',
+                    img.cornerColor = 'green',
+                    img.cornerSize = 10,
+                    img.transparentCorners = false,
+
+                    this.canvas.add(img);
+                    this.canvas.renderAll();
+                });
+                
+                this.canvas.discardActiveObject().renderAll();
+
+                this.isSticker = false;
+                this.targetSticker = null;
             }
         },
 
@@ -261,7 +285,7 @@ export default {
                 })
             }
 
-            this.$store.commit('setImgCanvas', [this.currImg, JSON.stringify(this.canvas.toObject(['id']))]);
+            this.$store.commit('setImgCanvas', [this.currImg, JSON.stringify(this.canvas.toObject(['id', 'borderColor', 'cornerColor', 'cornerSize', 'transparentCorners']))]);
         },
 
         applyFilterVal() {
@@ -282,6 +306,11 @@ export default {
             })
 
             this.saveWork();
+        },
+
+        drop(e) {
+            const dragImg = e.dataTransfer.getData('text/plain')
+            this.createDragObj('sticker', dragImg, e.offsetX, e.offsetY)
         },
     },
 }
