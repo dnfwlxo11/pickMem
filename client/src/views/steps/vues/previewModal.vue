@@ -3,10 +3,10 @@
     <div class="modal-mask">
       <div class="modal-wrapper">
         <div class="modal-container">
-          <div class="modal-header">
+          <div class="modal-header" style="border-bottom: 1px solid lightgrey;">
             <div class="row w-100 m-0 p-0">
               <div class="col-2"></div>
-              <div class="col-8 text-center">
+              <div class="col-8 d-flex justify-content-center align-items-center">
                 <strong>프레임 꾸미기 미리보기</strong>
               </div>
               <div class="col-2 text-right">
@@ -20,7 +20,7 @@
             <preview-frame :rows="rows" :columns="columns"></preview-frame>
           </div>
           <div class="modal-footer d-block">
-            <button type="button" class="btn btn-sm btn-block text-success" @click="$emit('on-close')">
+            <button type="button" class="btn btn-sm btn-block" @click="$emit('on-close')">
               <i class="mdi mdi-check"></i> 확인
             </button>
           </div>

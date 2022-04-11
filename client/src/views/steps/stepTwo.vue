@@ -122,10 +122,10 @@ export default {
     },
     mounted() {
         let table = this.$store.getters.getFrame
-
+        console.log(table)
         this.rows = table.split('x')[0];
         this.columns = table.split('x')[1];
-
+        console.log(this.rows, this.columns)
         this.images = this.$store.getters.getImages;
 
         if (this.getImageLen == 6) this.$store.commit('setNext', true);
@@ -162,6 +162,7 @@ export default {
                     this.$refs.camera.srcObject = stream;
                 })
                 .catch(error => {
+                    console.error(error)
                     this.isLoading = false;
                     this.canPhoto = false;
             });

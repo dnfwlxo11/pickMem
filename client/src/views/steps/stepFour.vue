@@ -3,11 +3,23 @@
         <div class="row m-0 p-0 mb-5">
             <div class="col-md-8 m-auto">
                 <div class="text-center mb-3">
-                    <div class="mb-2">
-                        <button class="btn btn-outline-primary mr-3" @click="isOpen=true">미 리 보 기</button>
-                        <button v-if="isWork" class="btn btn-outline-primary mr-2" @click="saveWork">저 장 하 기</button>
+                    <div class="row">
+                        <div class="col-8 ml-5 mb-2 text-left">
+                            <button class="btn btn-outline-primary mr-3" @click="isOpen=true">미 리 보 기</button>
+                            <button v-if="isWork" class="btn btn-outline-primary mr-2" @click="saveWork">저 장 하 기</button>
+                        </div>
+                        <div class="col-3">
+                            <div class="h-100 alert-icon d-flex justify-content-center align-items-center">
+                                <span><i class="mdi mdi-alert-circle-outline"></i></span> &nbsp;
+                                <small>주의사항</small>
+                                <div class="alert-msg">
+                                    <div class="text-center text-danger">
+                                        <strong>실제 효과들은 사진 뒤에 표시됩니다. <br> 미리보기 모드 버튼을 통해 확인할 수 있습니다.</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div v-if="isWork"><strong>Delete 키로 스티커를 지울 수 있습니다.</strong></div>
                 </div>
                 <div class="mb-3 d-flex justify-content-center">
                     <div ref="pic" :class="`outter-frame-${parseInt(frame.split('x')[0])}-${parseInt(frame.split('x')[1])}`" style="position: absolute; padding: 20px; padding-right: 0px;">
@@ -23,31 +35,26 @@
                         <canvas v-if="frame" :class="`outter-frame outter-frame-${parseInt(frame.split('x')[0])}-${parseInt(frame.split('x')[1])}`" ref="canvas"></canvas>
                     </div>
                 </div>
-                <div class="text-center text-danger">
-                    <strong>실제 효과들은 사진 뒤에 표시됩니다. <br> 미리보기 모드를 통해 확인할 수 있습니다.</strong>
-                </div>
+                <div class="mb-3 text-center" v-if="isWork"><strong>Delete 키로 스티커를 지울 수 있습니다.</strong></div>
             </div>
             <div class="col-md-4">
-                <span @click="isWork=false;setWorkMode();isMode='bg'" :class="{ 'target': isMode=='bg' }">배경색</span> | 
-                <span @click="isWork=false;setWorkMode();isMode='pattern'" :class="{ 'target': isMode=='pattern' }">패턴</span> |
-                <span @click="isWork=true;setWorkMode();isMode='sticker'" :class="{ 'target': isMode=='sticker' }">스티커</span>
+                <span :class="{ 'target': isMode=='bg' }" class="p-2" @click="isWork=false;setWorkMode();isMode='bg'">배경색</span> | 
+                <span :class="{ 'target': isMode=='sticker' }" class="p-2" @click="isWork=true;setWorkMode();isMode='sticker'">스티커</span>
                 <hr>
                 <div :style="`height: 600px;overflow-y: auto;`">
                     <div v-if="isMode=='bg'">
                         <div v-for="(value, theme) in bg" :key="theme">
                             <div class="mb-3"><strong>{{theme}} 테마</strong></div>
                             <div class="row m-0 p-0 mb-3">
-                                <div :class="{ 'target': targetColor == color }" class="col-md-2 m-0 p-0 pt-1 pb-1" v-for="(color, idx) of value" :key="idx">
+                                <div :class="{ 'target': targetColor == color }" class="col-md-3 m-0 p-0 mb-3 pt-1 pb-1" v-for="(color, idx) of value" :key="idx">
                                     <div class="bg m-auto" :style="{'background-color': color}" @click="selectBg(color)"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div v-else-if="isMode=='pattern'">
                         <div v-for="(value, theme) in pattern" :key="theme">
-                            <div class="mb-3"><strong>{{theme}} 테마</strong></div>
+                            <div class="mb-3"><strong>패턴</strong></div>
                             <div class="row m-0 p-0 mb-5">
-                                <div :id="`pattern_${item}`" :class="{ 'target': targetPattern == `pattern_${item}` }" class="col-3 mb-3 text-center" v-for="(item, idx) of value" :key="idx">
+                                <div :id="`pattern_${item}`" :class="{ 'target': targetPattern == `pattern_${item}` }" class="col-md-3 m-0 p-0 mb-3 pt-1 pb-1 text-center" v-for="(item, idx) of value" :key="idx">
                                     <img :ref="`pattern_${item}`" class="pattern" :src="require(`@/assets/pattern/pattern_${item}.png`)" @click="selectPattern(`pattern_${item}`)" draggable="false">
                                 </div>
                             </div>
@@ -171,7 +178,6 @@ export default {
         },
         loadCanvasToJSON() {
             return new Promise((resolve, reject) => {
-                console.log(JSON.parse(this.$store.getters.getCanvas))
                 this.canvas.loadFromJSON(this.$store.getters.getCanvas, this.canvas.renderAll.bind(this.canvas));
                 resolve();
             })
@@ -189,13 +195,16 @@ export default {
                     this.canvas.renderAll();
                 }
             }).on('mouse:up', (e) => {
-                console.log(e.pointer)
                 if (e.target) {
                     e.target.opacity = 1;
                     this.canvas.renderAll();
                 }
             }).on('selection:created', (e) => {
                 if (e.selected.length > 1) this.canvas.discardActiveObject().renderAll();
+            }).on('selection:cleared', (e) => {
+                console.log(e.target, 'cleared')
+                this.saveWork();
+                this.canvas.discardActiveObject().renderAll();
             })
         },
         setKeydownEvent(e) {
@@ -248,6 +257,8 @@ export default {
                 this.isSticker = false;
                 this.targetSticker = null;
             }
+
+            this.saveWork();
         },
         createDragObj(type, target, left, top) {
             if (type == 'sticker') {
@@ -261,16 +272,17 @@ export default {
 
                     this.canvas.add(img);
                     this.canvas.renderAll();
+                    
+                    this.saveWork();
                 });
-                
-                this.canvas.discardActiveObject().renderAll();
 
                 this.isSticker = false;
                 this.targetSticker = null;
             }
         },
         saveWork() {
-            // this.selectBg(this.targetColor);
+            this.canvas.discardActiveObject().renderAll();
+
             this.setWorkMode();
             this.$store.commit('setCanvas', JSON.stringify(this.canvas.toObject(['id', 'borderColor', 'cornerColor', 'cornerSize', 'transparentCorners'])));
             this.$store.commit('setFrameImg', this.canvas.toDataURL({ format: 'image/png' }));
@@ -372,8 +384,8 @@ export default {
         },
 
         drop(e) {
-            const dragImg = e.dataTransfer.getData('text/plain')
-            this.createDragObj('sticker', dragImg, e.offsetX, e.offsetY)
+            const dragImg = e.dataTransfer.getData('text/plain');
+            this.createDragObj('sticker', dragImg, e.offsetX, e.offsetY);
         },
     },
     computed: {
@@ -402,7 +414,7 @@ img {
 }
 
 .sticker, .pattern {
-    object-fit: contain;
+    object-fit: cover;
     height: 40px;
     width: 40px;
 }
@@ -505,5 +517,29 @@ img {
 
 .target {
     background-color: grey;
+}
+
+.alert-msg {
+    position: absolute;
+    opacity: 0;
+}
+
+.alert-icon:hover .alert-msg {
+    padding: 20px;
+    width: 400px;
+    top: -10;
+    left: -10;
+    z-index: 3;
+    background-color: #FFF;
+    border: 1px black solid;
+
+    animation: moveFromRight 0.7s ease both;
+
+    @keyframes moveFromRight {
+        to {
+            opacity: 1;
+            transform: translateY(10%);
+        }
+    }   
 }
 </style>

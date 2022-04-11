@@ -3,10 +3,10 @@
     <div class="modal-mask">
       <div class="modal-wrapper">
         <div class="modal-container">
-          <div class="modal-header">
+          <div class="modal-header" style="border-bottom: 1px solid lightgrey;">
             <div class="row w-100 m-0 p-0">
               <div class="col-2"></div>
-              <div class="col-8 text-center">
+              <div class="col-8 d-flex justify-content-center align-items-center">
                 <strong>{{title}}</strong>
               </div>
               <div class="col-2 text-right">
@@ -28,7 +28,6 @@
                     <i class="mdi mdi-check"></i> 확인
                 </button>
             </div>
-            
           </div>
         </div>
       </div>
@@ -55,7 +54,7 @@
 
 <style lang="scss" scoped>
   .modal-container {
-    max-width: 300px;
+    max-width: 400px;
     margin-top: calc(50%);
   }
 

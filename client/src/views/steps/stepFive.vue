@@ -1,11 +1,13 @@
 <template>
     <div class="step-five">
-        <div class="text-center mb-3">
-            <button class="btn btn-outline-primary mr-2" @click="saveWork">저장</button>
-            <button class="btn btn-outline-primary" @click="isOpen=true">미리보기</button>
-        </div>
         <div class="row m-0 p-0">
-            <div class="col-md-8">
+            <div class="col-md-8 text-center">
+                <div class="row">
+                    <div class="col-8 text-left ml-5 mb-2">
+                        <button class="btn btn-outline-primary mr-2" @click="saveWork">저장</button>
+                        <button class="btn btn-outline-primary" @click="isOpen=true">미리보기</button>
+                    </div>
+                </div>
                 <div class="d-flex justify-content-center align-items-center" @drop="drop" @dragover.prevent>
                     <canvas v-if="parseInt(frame.split('x')[0]) <= parseInt(frame.split('x')[1])" class="decoImg-horizontal" ref="canvas" width="600" height="450"></canvas>
                     <canvas v-else class="decoImg-vertical" ref="canvas" width="450" height="600"></canvas>
@@ -17,7 +19,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <span @click="isMode='filter'">필터</span> | <span @click="isMode='sticker'">스티커</span> | <span @click="isMode='draw'">그리기</span>
+                <span :class="{ 'target': isMode=='filter' }" class="p-2" @click="isDraw=false;setDrawMode();isMode='filter'">필터</span> | <span :class="{ 'target': isMode=='sticker' }" class="p-2" @click="isDraw=false;setDrawMode();isMode='sticker'">스티커</span> | <span :class="{ 'target': isMode=='draw' }" class="p-2" @click="isDraw=true;setDrawMode();isMode='draw'">그리기</span>
                 <hr>
                 <div v-if="isMode=='filter'">
                     <input type="range" min="0.0" max="1.0" step="0.01" v-model="filterVal">
@@ -78,13 +80,15 @@ export default {
                 'vintage': null,'pixelate': null, 'blur': null, 
             },
             filterVal: 0.5,
+            isDraw: false,
+            isDrawing: false,
+            ctx: null,
         }
     },
     created() {
         this.frame = this.$store.getters.getFrame;
     },
     mounted() {
-
         this.init();
         window.addEventListener('keydown', this.setKeydownEvent);
     },
@@ -101,11 +105,15 @@ export default {
             this.sticker.cute_natural_doodle = Array.from({length: 12}, (v, i) => i + 1);
             this.sticker.flower_leaf = Array.from({length: 38}, (v, i) => i + 1);
             this.canvas = new fabric.Canvas(this.$refs.canvas);
+            this.ctx = this.canvas.getContext('2d');
 
             await this.loadImgCanvas();
 
             this.setFilterObj();
             this.setMouseEvent();
+
+
+            this.initFreeDrawBrush();
         },
 
         setFilterObj() {
@@ -127,24 +135,38 @@ export default {
             this.canvas.discardActiveObject().renderAll();
 
             this.$store.commit('setTarget', [this.currImg, this.canvas.toDataURL()]);
-            this.$store.commit('setImgCanvas', [this.currImg, JSON.stringify(this.canvas.toObject(['id']))])
+            this.$store.commit('setImgCanvas', [this.currImg, JSON.stringify(this.canvas.toObject(['id', 'borderColor', 'cornerColor', 'cornerSize', 'transparentCorners']))])
         },
 
         setMouseEvent() {
             this.canvas.on('mouse:down', (e) => {
                 if (this.isSticker) {
                     this.createObj('sticker', e.pointer.x, e.pointer.y);
-                } else if (e.target) {
-                    e.target.opacity = 0.5;
-                    this.canvas.renderAll();
+                } else if (this.isDraw) {
+                    // this.isDrawing = true;
                 }
             }).on('mouse:up', (e) => {
-                if (e.target) {
+                if (this.isDraw) {
+                    // this.isDrawing = false;
+                    // this.saveWork();
+                } else if (e.target) {
                     e.target.opacity = 1;
                     this.canvas.renderAll();
                 }
+            }).on('mouse:move', (e) => {
+                // if (this.isDrawing) {
+                //     this.ctx.lineTo(e.pointer.x, e.pointer.y);
+                //     this.ctx.stroke();
+                // } else {
+                //     this.ctx.beginPath();
+                //     this.ctx.moveTo(e.pointer.x, e.pointer.y);
+                // }
+                // console.log(e.pointer.x, e.pointer.y, 'pointer mouse move');
             }).on('selection:created', (e) => {
                 if (e.selected.length > 1) this.canvas.discardActiveObject().renderAll();
+            }).on('selection:cleared', (e) => {
+                this.saveWork();
+                this.canvas.discardActiveObject().renderAll();
             })
         },
 
@@ -200,8 +222,10 @@ export default {
                 this.canvas.backgroundColor = '#FFFFFF';
                 this.canvas.renderAll();
 
-                this.$store.commit('setImgCanvas', [this.currImg, JSON.stringify(this.canvas.toObject(['id']))]);
+                this.$store.commit('setImgCanvas', [this.currImg, JSON.stringify(this.canvas.toObject(['id', 'borderColor', 'cornerColor', 'cornerSize', 'transparentCorners']))]);
             }
+
+            this.saveWork();
         },
 
         loadCanvasToJSON(json) {
@@ -225,7 +249,11 @@ export default {
             if (type == 'sticker') {
                 let image = new fabric.Image(this.$refs[this.targetSticker][0], {
                     left: left,
-                    top: top
+                    top: top,
+                    borderColor: 'red',
+                    cornerColor: 'green',
+                    cornerSize: 10,
+                    transparentCorners: false,
                 });
                 
                 image.left = left - (image.width / 2);
@@ -240,7 +268,7 @@ export default {
 
         createDragObj(type, target, left, top) {
             if (type == 'sticker') {
-                fabric.Image.fromURL(target,  (img) => {
+                fabric.Image.fromURL(target, (img) => {
                     img.left = left - (img.width / 2);
                     img.top = top - (img.height / 2);
                     img.borderColor = 'red',
@@ -250,9 +278,9 @@ export default {
 
                     this.canvas.add(img);
                     this.canvas.renderAll();
+
+                    this.saveWork();
                 });
-                
-                this.canvas.discardActiveObject().renderAll();
 
                 this.isSticker = false;
                 this.targetSticker = null;
@@ -288,10 +316,6 @@ export default {
             this.$store.commit('setImgCanvas', [this.currImg, JSON.stringify(this.canvas.toObject(['id', 'borderColor', 'cornerColor', 'cornerSize', 'transparentCorners']))]);
         },
 
-        applyFilterVal() {
-            
-        },
-
         async initImg(idx) {
             this.$set(this.images, idx, this.$store.getters.getTmpTarget(idx));
 
@@ -303,14 +327,24 @@ export default {
             this.canvas.setBackgroundImage(bgImg, this.canvas.renderAll.bind(this.canvas), {
                 scaleX: this.canvas.width / bgImg.width,
                 scaleY: this.canvas.height / bgImg.height
-            })
-
-            this.saveWork();
+            });
         },
 
         drop(e) {
-            const dragImg = e.dataTransfer.getData('text/plain')
-            this.createDragObj('sticker', dragImg, e.offsetX, e.offsetY)
+            const dragImg = e.dataTransfer.getData('text/plain');
+            this.createDragObj('sticker', dragImg, e.offsetX, e.offsetY);
+        },
+
+        initFreeDrawBrush() {
+            this.canvas.freeDrawingBrush.color = '#000';
+            this.canvas.freeDrawingBrush.width = 10;
+            this.canvas.isDrawingBrush = 1;
+            this.canvas.renderAll();
+        },
+
+        setDrawMode() {
+            this.canvas.selectable = this.isDraw;
+            this.canvas.renderAll();
         },
     },
 }
