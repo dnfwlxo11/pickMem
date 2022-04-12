@@ -3,13 +3,13 @@
         <div class="content" style="overflow-y: auto;">
             <nav-bar class="nav" :msg="msg[step]" @on-next="nextStep" @on-previous="previousStep" :step="step"></nav-bar>
              <!-- style="height: calc(100% - 150px);" -->
-            <div :class="{'moveFromRight': currDirection == 'right', 'moveFromLeft': currDirection == 'left'}" class="body container">
-                <step-one class="step-0" v-if="step==0"></step-one>
-                <step-two class="step-1" v-else-if="step==1"></step-two>
-                <step-three class="step-2" v-else-if="step==2"></step-three>
-                <step-four class="step-3" v-else-if="step==3"></step-four>
-                <step-five class="step-4" v-else-if="step==4"></step-five>
-                <step-result class="step-5" v-else @on-previous="previousStep"></step-result>
+            <div class="body container">
+                <step-one :class="{'moveFromRight': currDirection == 'right', 'moveFromLeft': currDirection == 'left'}" class="step-0" v-if="step==0"></step-one>
+                <step-two :class="{'moveFromRight': currDirection == 'right', 'moveFromLeft': currDirection == 'left'}" class="step-1" v-else-if="step==1"></step-two>
+                <step-three :class="{'moveFromRight': currDirection == 'right', 'moveFromLeft': currDirection == 'left'}" class="step-2" v-else-if="step==2"></step-three>
+                <step-four :class="{'moveFromRight': currDirection == 'right', 'moveFromLeft': currDirection == 'left'}" class="step-3" v-else-if="step==3"></step-four>
+                <step-five :class="{'moveFromRight': currDirection == 'right', 'moveFromLeft': currDirection == 'left'}" class="step-4" v-else-if="step==4"></step-five>
+                <step-result :class="{'moveFromRight': currDirection == 'right', 'moveFromLeft': currDirection == 'left'}" class="step-5" v-else @on-previous="previousStep"></step-result>
             </div>
         </div>
         <footer-bar class="footer"></footer-bar>
@@ -57,6 +57,8 @@ export default {
         nextStep() {
             let canNext = this.$store.getters.getNext;
 
+            this.currDirection = 'right';
+
             if (this.step == 0 && !canNext) {
                 this.$Utils.toast('액자를 골라주세요.')
                 return;
@@ -72,14 +74,15 @@ export default {
 
             if (this.step == 1 && Object.keys(this.$store.getters.getImages).length < 6) return;
 
-            this.currDirection = 'right';
+            
             this.step += 1;
         },
 
         previousStep() {
+            this.currDirection = 'left';
+
             if (this.step == 0) this.$router.push('/');
 
-            this.currDirection = 'left';
             this.step -= 1;
         },
     },

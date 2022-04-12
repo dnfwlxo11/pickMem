@@ -19,7 +19,9 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <span :class="{ 'target': isMode=='filter' }" class="p-2" @click="isDraw=false;setDrawMode();canvas.isDrawingMode=0;isMode='filter'">필터</span> | <span :class="{ 'target': isMode=='sticker' }" class="p-2" @click="isDraw=false;setDrawMode();canvas.isDrawingMode=0;isMode='sticker'">스티커</span> | <span :class="{ 'target': isMode=='draw' }" class="p-2" @click="isDraw=true;setDrawMode();canvas.isDrawingMode=1;isMode='draw'">그리기</span>
+                <span :class="{ 'target': isMode=='filter' }" class="p-2" @click="isDraw=false;setDrawMode();canvas.isDrawingMode=false;isMode='filter'">필터</span> | 
+                <span :class="{ 'target': isMode=='sticker' }" class="p-2" @click="isDraw=false;setDrawMode();canvas.isDrawingMode=false;isMode='sticker'">스티커</span> | 
+                <span :class="{ 'target': isMode=='draw' }" class="p-2" @click="isDraw=true;setDrawMode();canvas.isDrawingMode=true;isMode='draw'">그리기</span>
                 <hr>
                 <div v-if="isMode=='filter'">
                     <input type="range" min="0.0" max="1.0" step="0.01" v-model="filterVal">
@@ -38,6 +40,23 @@
                                 <img :ref="`${theme}_${item}`" class="sticker" :src="require(`@/assets/stickers/${theme}_${item}.png`)">
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div v-else-if="isMode=='draw'" style="height: 600px;overflow-y: auto;">
+                    <small>굵  기</small> <br>
+                    <div class="row mb-3 m-0 p-0">
+                        <div class="col-md-2 mr-1 circle circle-1" @click="lineWidth=7;"></div>
+                        <div class="col-md-2 mr-1 circle circle-2" @click="lineWidth=10;"></div>
+                        <div class="col-md-2 mr-1 circle circle-3" @click="lineWidth=13;"></div>
+                        <div class="col-md-2 mr-1 circle circle-4" @click="lineWidth=16;"></div>
+                        <div class="col-md-2 mr-1 circle circle-5" @click="lineWidth=19;"></div>
+                    </div>
+                    <div class="mb-3">
+                        <small>색  상</small> <br>
+                        <input type="color" v-model="lineColor">
+                    </div>
+                    <div class="mb-3">
+                        <small>지우개</small>
                     </div>
                 </div>
             </div>
@@ -82,7 +101,9 @@ export default {
             filterVal: 0.5,
             isDraw: false,
             isDrawing: false,
-            ctx: null,
+            lineColor: '#000',
+            lineWidth: 10,
+            isErase: false,
         }
     },
     created() {
@@ -106,6 +127,7 @@ export default {
             this.sticker.flower_leaf = Array.from({length: 38}, (v, i) => i + 1);
             this.canvas = new fabric.Canvas(this.$refs.canvas);
             this.ctx = this.canvas.getContext('2d');
+            this.ctx.strokeStyle = '#FFF'
 
             await this.loadImgCanvas();
 
@@ -331,9 +353,8 @@ export default {
         },
 
         initFreeDrawBrush() {
-            this.canvas.freeDrawingBrush.color = '#000';
-            this.canvas.freeDrawingBrush.width = 10;
-            // this.canvas.isDrawingMode = 1;
+            this.canvas.freeDrawingBrush.color = this.lineColor;
+            this.canvas.freeDrawingBrush.width = this.lineWidth;
             this.canvas.renderAll();
         },
 
@@ -342,6 +363,15 @@ export default {
             this.canvas.renderAll();
         },
     },
+    watch: {
+        lineColor(val) {
+            this.lineColor = val;
+            this.canvas.freeDrawingBrush.color = val
+        },
+        lineWidth(val) {
+            this.canvas.freeDrawingBrush.width = val;
+        }
+    }
 }
 </script>
 
@@ -378,5 +408,35 @@ export default {
     object-fit: contain;
     height: 40px;
     width: 40px;
+}
+
+.circle {
+    border-radius: 50%;
+    background-color: #000;
+
+    &-1 {
+        height: 10px;
+        width: 10px;
+    }
+
+    &-2 {
+        height: 20px;
+        width: 20px;
+    }
+
+    &-3 {
+        height: 30px;
+        width: 30px;
+    }
+
+    &-4 {
+        height: 40px;
+        width: 40px;
+    }
+
+    &-5 {
+        height: 50px;
+        width: 50px;
+    }
 }
 </style>
