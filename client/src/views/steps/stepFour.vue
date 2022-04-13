@@ -4,7 +4,8 @@
             <div class="col-md-8 m-auto">
                 <div class="text-center mb-3">
                     <div class="row">
-                        <div class="col-8 ml-5 mb-2 text-left">
+                        <div class="col-3"></div>
+                        <div class="col-5 ml-5 mb-2 text-center">
                             <button class="btn btn-outline-primary mr-3" @click="canvas.discardActiveObject().renderAll();isOpen=true">미 리 보 기</button>
                             <button v-if="isWork" class="btn btn-outline-primary mr-2" @click="saveWork">저 장 하 기</button>
                         </div>

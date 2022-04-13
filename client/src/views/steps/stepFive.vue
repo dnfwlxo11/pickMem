@@ -3,7 +3,7 @@
         <div class="row m-0 p-0">
             <div class="col-md-8 text-center">
                 <div class="row">
-                    <div class="col-8 text-left ml-5 mb-2">
+                    <div class="col mb-2">
                         <button class="btn btn-outline-primary mr-2" @click="saveWork">저장</button>
                         <button class="btn btn-outline-primary" @click="isOpen=true">미리보기</button>
                     </div>
@@ -23,16 +23,16 @@
                 <span :class="{ 'target': isMode=='sticker' }" class="p-2" @click="isDraw=false;setDrawMode();canvas.isDrawingMode=false;isMode='sticker'">스티커</span> | 
                 <span :class="{ 'target': isMode=='draw' }" class="p-2" @click="isDraw=true;setDrawMode();canvas.isDrawingMode=true;isMode='draw'">그리기</span>
                 <hr>
-                <div v-if="isMode=='filter'">
-                    <input type="range" min="0.0" max="1.0" step="0.01" v-model="filterVal">
+                <div v-show="isMode=='filter'">
                     <div v-if="images[currImg]" class="row" style="height: 600px;overflow-y: auto;">
                         <div :class="{ 'target': targetFilter == filter }" class="col-5 text-center mr-auto ml-auto mb-3 card" v-for="(obj, filter) in filters" :key="filter" @click="selectFilter(filter)">
-                            <img :class="`${parseInt(frame.split('x')[0]) <= parseInt(frame.split('x')[1]) ? 'filterImg-horizontal' : 'filterImg-vertical'}`" class="pt-1 mb-2 m-auto">
+                            <canvas :ref="`${filter}_canvas`" :height="`${parseInt(frame.split('x')[0]) <= parseInt(frame.split('x')[1]) ? '75px' : '100px'}`" :width="`${parseInt(frame.split('x')[0]) <= parseInt(frame.split('x')[1]) ? '100px' : '75px'}`" class="pt-1 mb-2"></canvas>
+                            <img :ref="`${filter}_sample`" :src="require(`@/assets/img/filter-sample.jpg`)" :class="`${parseInt(frame.split('x')[0]) <= parseInt(frame.split('x')[1]) ? 'filterImg-horizontal' : 'filterImg-vertical'}`" style="position: absolute;visibility: hidden;">
                             <div>{{filter}}</div>
                         </div>
                     </div>
                 </div>
-                <div v-else-if="isMode=='sticker'" style="height: 600px;overflow-y: auto;">
+                <div v-show="isMode=='sticker'" style="height: 600px;overflow-y: auto;">
                     <div v-for="(value, theme) in sticker" :key="theme">
                         <div class="mb-3"><strong>{{theme}} 테마</strong></div>
                         <div class="row m-0 p-0 mb-5">
@@ -42,7 +42,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-else-if="isMode=='draw'" style="height: 600px;overflow-y: auto;">
+                <div v-show="isMode=='draw'" style="height: 600px;overflow-y: auto;">
                     <small>굵  기</small> <br>
                     <div class="row mb-3 m-0 p-0">
                         <div class="col-md-2 mr-1 circle circle-1" @click="lineWidth=7;"></div>
@@ -56,7 +56,9 @@
                         <input type="color" v-model="lineColor">
                     </div>
                     <div class="mb-3">
-                        <small>지우개</small>
+                        <button @click="eraseMode">
+                            <small>지우개</small>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -78,6 +80,8 @@ export default {
     },
     data() {
         return {
+            filterCanvas: {},
+
             currImg: 1,
             frame: null,
             rows: 2,
@@ -134,6 +138,7 @@ export default {
             this.setFilterObj();
             this.setMouseEvent();
 
+            this.previewFilter();
 
             this.initFreeDrawBrush();
         },
@@ -262,6 +267,27 @@ export default {
             });
         },
 
+        loadImgFromURL(url) {
+            return new Promise((resolve, reject) => {
+                const canvas = document.createElement('canvas');
+                const img = new Image();
+
+                img.onload = () => {
+                    canvas.height = img.height
+                    canvas.width = img.width
+
+                    const ctx = canvas.getContext("2d");
+
+                    ctx.drawImage(img, 0, 0);
+                    const dataURL = canvas.toDataURL('image/png')
+
+                    resolve(dataURL)
+                }
+
+                img.src = url;
+            })
+        },
+
         createObj(type, left, top) {
             if (type == 'sticker') {
                 let image = new fabric.Image(this.$refs[this.targetSticker][0], {
@@ -307,6 +333,29 @@ export default {
         selectSticker(id) {
             if (this.targetSticker == id) this.targetSticker = null;
             else this.targetSticker = id;
+        },
+
+        previewFilter() {
+            const sampleFilter = Object.keys(this.$refs).filter(item => item.includes('sample'))
+            sampleFilter.forEach(async (filter) => {
+                const filterName = filter.split('_')[0]
+                const canvasId = `${filterName}_canvas`
+
+                this.filterCanvas[canvasId] = new fabric.Canvas(this.$refs[canvasId][0])
+                const base64String = await this.loadImgFromURL(this.$refs[filter][0].src);
+                const bgImg = await this.loadImgFromBase64(base64String);
+
+                bgImg.filters = [this.filters[filterName]];
+                bgImg.applyFilters();
+
+                console.log(bgImg.width, bgImg.height, 'width height')
+                console.log(this.$refs[filter][0].width, this.$refs[filter][0].height, 'real width height')
+
+                this.filterCanvas[canvasId].setBackgroundImage(bgImg, this.filterCanvas[canvasId].renderAll.bind(this.filterCanvas[canvasId]), {
+                    scaleX: this.filterCanvas[canvasId].width / bgImg.width,
+                    scaleY: this.filterCanvas[canvasId].height / bgImg.height
+                })
+            })
         },
 
         async selectFilter(target) {
@@ -355,11 +404,20 @@ export default {
         initFreeDrawBrush() {
             this.canvas.freeDrawingBrush.color = this.lineColor;
             this.canvas.freeDrawingBrush.width = this.lineWidth;
+            this.canvas.freeDrawingBrush.globalCompositeOperation = 'source-over';
             this.canvas.renderAll();
         },
 
         setDrawMode() {
             // this.canvas.selectable = this.isDraw;
+            this.canvas.renderAll();
+        },
+
+        eraseMode() {
+            this.isErase = !this.isErase;
+            this.canvas.freeDrawingBrush.color = 'rgba(0,0,0,0)';
+            this.canvas.freeDrawingBrush.globalCompositeOperation = 'destination-out';
+            this.canvas.erasingBrush = true;
             this.canvas.renderAll();
         },
     },

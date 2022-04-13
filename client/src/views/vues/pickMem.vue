@@ -2,7 +2,6 @@
     <div class="pick-mem h-100">
         <div class="content" style="overflow-y: auto;">
             <nav-bar class="nav" :msg="msg[step]" @on-next="nextStep" @on-previous="previousStep" :step="step"></nav-bar>
-             <!-- style="height: calc(100% - 150px);" -->
             <div class="body container">
                 <step-one :class="{'moveFromRight': currDirection == 'right', 'moveFromLeft': currDirection == 'left'}" class="step-0" v-if="step==0"></step-one>
                 <step-two :class="{'moveFromRight': currDirection == 'right', 'moveFromLeft': currDirection == 'left'}" class="step-1" v-else-if="step==1"></step-two>

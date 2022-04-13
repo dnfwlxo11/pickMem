@@ -15,7 +15,8 @@
                     <hr>
                     <div class="images text-center">
                         <div class="mb-3" v-for="(value, id) in images" :key="id">
-                            <img :class="`mr-3 ${getSelectList.includes(id) ? 'selected' : ''} ${rows <= columns ? 'previewImg-horizontal' : 'previewImg-vertical'}`" :src="value" alt="" :id="`${id}`" @click="selectToClick(id, value)" draggable="false">
+                            <i v-if="getSelectList.includes(id)" class="mdi mdi-check mr-2" style="font-size: 30px;"></i>
+                            <img :class="`m-auto mr-3 ${getSelectList.includes(id) ? 'selected' : ''} ${rows <= columns ? 'previewImg-horizontal' : 'previewImg-vertical'}`" :src="value" alt="" :id="`${id}`" @click="selectToClick(id, value)" draggable="false">
                             <hr>
                         </div>
                     </div>
