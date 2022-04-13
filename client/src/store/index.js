@@ -14,7 +14,7 @@ const getDefaultState = () => {
     imgCanvas: {},
     images: {},
     selectTarget: {},
-    selectList: [],
+    selectList: {},
     tmpTarget: {},
     orderQueue: [],
   };
@@ -41,7 +41,9 @@ export default new Vuex.Store({
       state.selectList = arr;
     },
     setTargetListRemove(state, idx) {
-      state.selectList.splice(idx - 1, 1);
+      console.log(state.selectList, 'store select list')
+      Vue.delete(state.selectList, idx);
+      // state.selectList.splice(idx - 1, 1);
     },
     setTmpTarget(state, targetObj) {
       Vue.set(state.tmpTarget, targetObj[0], targetObj[1]);

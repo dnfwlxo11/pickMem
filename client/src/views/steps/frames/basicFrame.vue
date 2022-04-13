@@ -12,7 +12,7 @@
                     </div>
                     <div v-else :class="`inner-frame-${columns}-${rows}`">
                         <img :src="images[rowIdx*colCnt.length + col]" :id="`canvas-${rowIdx*colCnt.length + col}`" draggable="false">
-                        <div class="overlay" @click="removeImg(rowIdx*colCnt.length + col)"><i class="mdi mdi-close"></i></div>
+                        <div class="overlay" @click="removeImg(rowIdx*colCnt.length + col)"><i class="mdi mdi-close-circle"></i></div>
                     </div>
                 </div>
             </div>
@@ -51,6 +51,7 @@ export default {
     },
     methods: {
         removeImg(target) {
+            console.log(target, 'basicFrame')
             this.$delete(this.images, target);
             this.$store.commit('setTargets', this.images);
             this.$store.commit('setTmpTargets', this.images);
@@ -189,6 +190,6 @@ img {
     position: absolute;
     font-size: 30px;
     top: 0%;
-    left: 0%;
+    left: 2%;
 }
 </style>

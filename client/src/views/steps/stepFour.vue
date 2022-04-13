@@ -15,7 +15,7 @@
                                 <small>주의사항</small>
                                 <div class="alert-msg">
                                     <div class="text-center text-danger">
-                                        <strong>실제 효과들은 사진 뒤에 표시됩니다. <br> 미리보기 모드 버튼을 통해 확인할 수 있습니다.</strong>
+                                        <strong>실제 효과들은 사진 뒤에 표시됩니다. <br> 미리보기 버튼을 통해 확인할 수 있습니다.</strong>
                                     </div>
                                 </div>
                             </div>

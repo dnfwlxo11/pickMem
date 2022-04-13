@@ -52,11 +52,11 @@
                         </div>
                     </div>
                     <div class="mb-3"><small>색  상</small></div>
-                    <div class="mb-3">
+                    <div class="mb-5">
                         <input type="color" v-model="lineColor">
                     </div>
                     <div class="mb-3">
-                        <button class="btn-custom" @click="clearPath">초기화</button>
+                        <button class="btn-custom" @click="clearPath">처음으로</button>
                     </div>
                 </div>
             </div>

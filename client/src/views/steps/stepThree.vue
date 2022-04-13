@@ -14,9 +14,9 @@
                     <div>이미지 리스트</div>
                     <hr>
                     <div class="images text-center">
-                        <div class="mb-3" v-for="(value, id) in images" :key="id">
-                            <i v-if="getSelectList.includes(id)" class="mdi mdi-check mr-2" style="font-size: 30px;"></i>
-                            <img :class="`m-auto mr-3 ${getSelectList.includes(id) ? 'selected' : ''} ${rows <= columns ? 'previewImg-horizontal' : 'previewImg-vertical'}`" :src="value" alt="" :id="`${id}`" @click="selectToClick(id, value)" draggable="false">
+                        <div class="mb-3" v-for="(id, idx) of Object.keys(images)" :key="id">
+                            <i v-if="Object.values(getSelectList).includes(id)" class="mdi mdi-check-circle mr-2" style="font-size: 30px;"></i>
+                            <img :class="`m-auto mr-3 ${Object.values(getSelectList).includes(id) ? 'selected' : ''} ${rows <= columns ? 'previewImg-horizontal' : 'previewImg-vertical'}`" :src="images[id]" alt="" :id="`${id}`" @click="selectToClick(getSelectTargetLen, id, images[id])" draggable="false">
                             <hr>
                         </div>
                     </div>
@@ -43,7 +43,7 @@ export default {
             width: 500,
             images: {},
             selectTarget: {},
-            selectList: [],
+            selectList: {},
             frame: null,
             queue: [],
         }
@@ -77,8 +77,8 @@ export default {
     },
 
     methods: {
-        selectToClick(id, src) {
-            if (this.getSelectList.includes(id)) return;
+        selectToClick(idx, id, src) {
+            if (Object.values(this.getSelectList).includes(id)) return;
 
             this.selectTarget = this.$store.getters.getTargets;
             let table = this.frame.split('x');
@@ -88,7 +88,7 @@ export default {
                 return;
             } else {
                 this.queue = this.$store.getters.getRemoveQueues;
-                this.selectList.push(id);
+                this.$set(this.selectList, idx + 1, id);
 
                 let recoverKey = this.queue.shift();
 
@@ -106,9 +106,11 @@ export default {
     },
     computed: {
         getSelectList() {
-            console.log(this.selectList);
             return this.selectList;
-        }
+        },
+        getSelectTargetLen() {
+            return Object.keys(this.selectTarget).length;
+        },
     },
 }
 </script>

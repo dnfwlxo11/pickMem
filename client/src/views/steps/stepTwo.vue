@@ -10,7 +10,8 @@
             <div v-else-if="!isLoading && canPhoto" class="d-flex justify-content-center align-items-center">
                 <div v-if="rows <= columns" class="camera-horizontal camera-frame">
                     <div class="col-custom h-100 text-center d-flex align-items-center justify-content-center" style="width: 50px;color: #FFF;font-size: 20px;">
-                        <div v-if="getImageLen < 6">{{6 - getImageLen}}<br>장<br><br>남<br>았<br>어<br>요<br>!</div>
+                        <div v-if="isPhotoTaken">마<br>음<br>에<br><br>들<br>면<br><br>다<br>음<br>으<br>로<br>!</div>
+                        <div v-else-if="getImageLen < 6">{{6 - getImageLen}}<br>장<br><br>남<br>았<br>어<br>요<br>!</div>
                         <div v-else>이<br>제<br><br>꾸<br>미<br>러<br><br>가<br>볼<br>까<br>요<br>?</div>
                     </div>
                     <div class="col-custom">
@@ -24,7 +25,11 @@
                             </div>
                             <div class="d-flex justify-content-center align-items-center" style="height: 300px;">
                                 <div v-if="getImageLen < 6" class="takePic d-flex justify-content-center align-items-center" v-on="isPhotoTaken ? { click:() => { saveImage(); isPhotoTaken=false; }} : { click:() => { takePhoto(); }}">
-                                    <div class="takePic-inner"></div>
+                                    <div class="takePic-inner">
+                                        <div v-if="isPhotoTaken" class="h-100 d-flex justify-content-center align-items-center">
+                                            <i class="mdi mdi-tray-plus" style="font-size: 20px;"></i>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div v-else-if="getImageLen == 6" class="takePic d-flex justify-content-center align-items-center" style="font-size: 25px;">
                                     <i class="mdi mdi-restore" @click="isOpen=true;"></i>
@@ -36,7 +41,8 @@
                 </div>
                 <div v-else class="camera-vertical camera-frame">
                     <div class="d-flex justify-content-center align-items-center" style="height: 50px;color: #FFF;font-size: 20px;">
-                        <div v-if="getImageLen < 6">{{6 - getImageLen}} 장 남았어요!</div>
+                        <div v-if="isPhotoTaken">마음에 들면 다음 사진찍어볼까</div>
+                        <div v-else-if="getImageLen < 6">{{6 - getImageLen}} 장 남았어요!</div>
                         <div v-else>이제 꾸미러 가볼까요?</div>
                     </div>
                     <div>
@@ -52,7 +58,12 @@
                                         <i class="mdi mdi-restore" @click="isOpen=true;"></i>
                                     </div>
                                     <div v-else class="takePic d-flex justify-content-center align-items-center" v-on="isPhotoTaken ? { click:() => { saveImage(); isPhotoTaken=false; }} : { click:() => { takePhoto(); }}">
-                                        <div class="takePic-inner"></div>
+                                        <div class="takePic-inner">
+                                            
+                                        </div>
+                                        <div v-if="isPhotoTaken">
+                                            <i class="mdi mdi-image-plus"></i>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-2 d-flex align-items-center justify-content-center">
@@ -85,7 +96,7 @@
                             </div>
                         </div>
                     </div>
-                    <div v-if="getImageLen == 6" class="text-center"><button class="btn btn-outline-danger" @click="initImage">초기화</button></div>
+                    <div v-if="getImageLen == 6" class="text-center"><button class="btn-custom" @click="initImage">초기화</button></div>
                 </div>
                 <div class="text-center" v-if="getImageLen < 6">카메라가 없다면 가지고 계신 사진을 6장까지 넣어주세요!</div>
                 <input ref="fileInput" @change="onImageUpload" type="file" style="display: none;" multiple>
@@ -244,7 +255,7 @@ export default {
     computed: {
         getImageLen() {
             return Object.keys(this.images).length;
-        }
+        },
     },
     watch: {
         images: {
