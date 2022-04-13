@@ -1,8 +1,8 @@
 <template>
     <div class="step-result">
         <div class="text-center mb-3">
-            <button class="btn btn-outline-primary mr-3" @click="saveResult">저 장 하 기</button>
-            <button class="btn btn-outline-primary" @click="$router.push('/')">다 시 하 기</button>
+            <button class="btn-custom mr-3" @click="saveResult">저 장 하 기</button>
+            <button class="btn-custom" @click="$router.push('/')">다 시 하 기</button>
         </div>
         <div class="mb-5">
             <div ref="result" :class="`m-auto outter-frame outter-frame-${columns}-${rows}`">

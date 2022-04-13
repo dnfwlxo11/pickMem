@@ -18,4 +18,18 @@ export default {
 </script>
 
 <style lang="scss">
+.btn-custom {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: 1px solid black;
+  background-color: white;
+  color: black;
+}
+
+.btn-custom:hover {
+  background-color: black;
+  color: white;
+}
 </style>

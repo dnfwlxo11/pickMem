@@ -1,11 +1,12 @@
 <template>
-    <div class="main-page d-flex justify-content-center align-items-center">
+    <div class="main-page d-flex justify-content-center align-items-center" @click="init();$router.push('/pickMem')">
         <div class="text-center">
             <div class="title">
-                <div><strong>Pick The Moment</strong></div>
-                <div class="mb-3"><small>지금 이 순간을 영원히 기억할 수 있어요.</small></div>
-                <button class="btn btn-outline-primary" @click="init();$router.push('/pickMem')">시 작 하 기</button>
+                <div><strong>Pick The Moment</strong></div>    
             </div>
+            <div class="sub-title mb-5"><small>지금 이 순간을 영원히 기억할 수 있어요.</small></div>
+
+            <span>Click to Start</span>
         </div>
     </div>    
 </template>
@@ -26,6 +27,10 @@ export default {
 
 <style scoped>
 .title {
+    font-size: 60px;
+}
+
+.sub-title {
     font-size: 25px;
 }
 </style>

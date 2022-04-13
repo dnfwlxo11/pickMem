@@ -10,7 +10,7 @@
                 <strong>프레임 꾸미기 미리보기</strong>
               </div>
               <div class="col-2 text-right">
-                <a href="javascript:;" class="btn btn-sm" @click="$emit('on-close')">
+                <a href="javascript:;" @click="$emit('on-close')" style="color: black;">
                   <i class="mdi mdi-close"></i>
                 </a>
               </div>
@@ -20,7 +20,7 @@
             <preview-frame :rows="rows" :columns="columns"></preview-frame>
           </div>
           <div class="modal-footer d-block">
-            <button type="button" class="btn btn-sm btn-block" @click="$emit('on-close')">
+            <button type="button" class="btn-custom btn-block" @click="$emit('on-close')">
               <i class="mdi mdi-check"></i> 확인
             </button>
           </div>

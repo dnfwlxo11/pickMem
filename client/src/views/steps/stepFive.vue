@@ -3,19 +3,21 @@
         <div class="row m-0 p-0">
             <div class="col-md-8 text-center">
                 <div class="row">
-                    <div class="col mb-2">
-                        <button class="btn btn-outline-primary mr-2" @click="saveWork">저장</button>
-                        <button class="btn btn-outline-primary" @click="isOpen=true">미리보기</button>
+                    <div class="col mb-3">
+                        <!-- <button class="btn-custom mr-2" @click="saveWork">저장</button> -->
+                        <button class="btn-custom" @click="isOpen=true">미리보기</button>
                     </div>
                 </div>
                 <div class="d-flex justify-content-center align-items-center" @drop="drop" @dragover.prevent>
                     <canvas v-if="parseInt(frame.split('x')[0]) <= parseInt(frame.split('x')[1])" class="decoImg-horizontal" ref="canvas" width="600" height="450"></canvas>
                     <canvas v-else class="decoImg-vertical" ref="canvas" width="450" height="600"></canvas>
                 </div>
-                <div class="text-center">
-                    <span @click="prevImg"><i class="mdi mdi-arrow-left-bold" style="font-size: 50px;"></i></span>
-                    <span style="font-size: 25px;">{{currImg}} / {{Object.keys(images).length}}</span>
-                    <span @click="nextImg"><i class="mdi mdi-arrow-right-bold" style="font-size: 50px;"></i></span>
+                <div class="row w-100 text-center">
+                    <div class="col-3"></div>
+                    <div class="col-2"><span @click="prevImg"><i class="mdi mdi-chevron-left" style="font-size: 40px;"></i></span></div>
+                    <div class="col-2 d-flex justify-content-center align-items-center"><span style="font-size: 25px;">{{currImg}} / {{Object.keys(images).length}}</span></div>
+                    <div class="col-2"><span @click="nextImg"><i class="mdi mdi-chevron-right" style="font-size: 40px;"></i></span></div>
+                    <div class="col-3"></div>
                 </div>
             </div>
             <div class="col-md-4">
@@ -43,22 +45,18 @@
                     </div>
                 </div>
                 <div v-show="isMode=='draw'" style="height: 600px;overflow-y: auto;">
-                    <small>굵  기</small> <br>
+                    <div class="mb-3"><small>굵  기</small></div>
                     <div class="row mb-3 m-0 p-0">
-                        <div class="col-md-2 mr-1 circle circle-1" @click="lineWidth=7;"></div>
-                        <div class="col-md-2 mr-1 circle circle-2" @click="lineWidth=10;"></div>
-                        <div class="col-md-2 mr-1 circle circle-3" @click="lineWidth=13;"></div>
-                        <div class="col-md-2 mr-1 circle circle-4" @click="lineWidth=16;"></div>
-                        <div class="col-md-2 mr-1 circle circle-5" @click="lineWidth=19;"></div>
+                        <div class="col-md-2 m-0 p-0 m-auto" :class="{ 'target': targetLineWidth == widthStep }" v-for="(widthStep, idx) of ['1', '2', '3', '4', '5']" :key="idx" @click="targetLineWidth=widthStep;lineWidth=widthSteps[idx];">
+                            <div :class="`ml-auto mr-auto circle circle-${widthStep}`"></div>
+                        </div>
                     </div>
+                    <div class="mb-3"><small>색  상</small></div>
                     <div class="mb-3">
-                        <small>색  상</small> <br>
                         <input type="color" v-model="lineColor">
                     </div>
                     <div class="mb-3">
-                        <button @click="eraseMode">
-                            <small>지우개</small>
-                        </button>
+                        <button class="btn-custom" @click="clearPath">초기화</button>
                     </div>
                 </div>
             </div>
@@ -92,6 +90,8 @@ export default {
             isSticker: false,
             targetFilter: 'normal',
             targetSticker: null,
+            targetLineWidth: '1',
+            widthSteps: [7, 10, 13, 16, 19],
             sticker: {
                 'cute_handdrawn': [],
                 'cute_natural_doodle': [],
@@ -104,7 +104,6 @@ export default {
             },
             filterVal: 0.5,
             isDraw: false,
-            isDrawing: false,
             lineColor: '#000',
             lineWidth: 10,
             isErase: false,
@@ -167,25 +166,21 @@ export default {
 
         setMouseEvent() {
             this.canvas.on('mouse:down', (e) => {
+                if (e.type == 'path') this.canvas.discardActiveObject().renderAll();
                 if (this.isSticker) {
                     this.createObj('sticker', e.pointer.x, e.pointer.y);
                 }
             }).on('mouse:up', (e) => {
-                if (e.target) {
+                if (this.isDraw) {
+                    this.saveWork();
+                } else if (e.target) {
                     e.target.opacity = 1;
                     this.canvas.renderAll();
                 }
             }).on('mouse:move', (e) => {
-                // if (this.isDrawing) {
-                //     this.ctx.lineTo(e.pointer.x, e.pointer.y);
-                //     this.ctx.stroke();
-                // } else {
-                //     this.ctx.beginPath();
-                //     this.ctx.moveTo(e.pointer.x, e.pointer.y);
-                // }
-                // console.log(e.pointer.x, e.pointer.y, 'pointer mouse move');
             }).on('selection:created', (e) => {
                 if (e.selected.length > 1) this.canvas.discardActiveObject().renderAll();
+                if (e.selected[0].type == 'path') this.canvas.discardActiveObject().renderAll();
             }).on('selection:cleared', (e) => {
                 this.saveWork();
                 this.canvas.discardActiveObject().renderAll();
@@ -203,6 +198,8 @@ export default {
 
                 this.canvas.remove(targetObj);
                 this.canvas.renderAll();
+
+                this.saveWork();
             }
         },
 
@@ -212,6 +209,7 @@ export default {
             this.currImg -= 1;
 
             await this.loadImgCanvas();
+            this.saveWork();
         },
 
         async nextImg() {
@@ -220,6 +218,7 @@ export default {
             this.currImg += 1;
 
             await this.loadImgCanvas();
+            this.saveWork();
         },
 
         async loadImgCanvas() {
@@ -348,9 +347,6 @@ export default {
                 bgImg.filters = [this.filters[filterName]];
                 bgImg.applyFilters();
 
-                console.log(bgImg.width, bgImg.height, 'width height')
-                console.log(this.$refs[filter][0].width, this.$refs[filter][0].height, 'real width height')
-
                 this.filterCanvas[canvasId].setBackgroundImage(bgImg, this.filterCanvas[canvasId].renderAll.bind(this.filterCanvas[canvasId]), {
                     scaleX: this.filterCanvas[canvasId].width / bgImg.width,
                     scaleY: this.filterCanvas[canvasId].height / bgImg.height
@@ -368,7 +364,7 @@ export default {
                     scaleY: this.canvas.height / bgImg.height
                 })
             } else {
-                const bgImg = await this.loadImgFromBase64(this.images[this.currImg]);
+                const bgImg = await this.loadImgFromBase64(this.$store.getters.getTmpTarget(this.currImg));
 
                 this.targetFilter = target;
                 bgImg.filters = [this.filters[this.targetFilter]];
@@ -380,6 +376,7 @@ export default {
             }
 
             this.$store.commit('setImgCanvas', [this.currImg, JSON.stringify(this.canvas.toObject(['id', 'borderColor', 'cornerColor', 'cornerSize', 'transparentCorners']))]);
+            this.saveWork();
         },
 
         async initImg(idx) {
@@ -415,11 +412,19 @@ export default {
 
         eraseMode() {
             this.isErase = !this.isErase;
+            this.canvas.freeDrawingBrush.fillStyle = 'rgba(0,0,0,0)'
             this.canvas.freeDrawingBrush.color = 'rgba(0,0,0,0)';
             this.canvas.freeDrawingBrush.globalCompositeOperation = 'destination-out';
-            this.canvas.erasingBrush = true;
             this.canvas.renderAll();
         },
+        clearPath() {
+            const lineObj = this.canvas.getObjects().filter((item) => item.type == 'path')
+            lineObj.forEach((path) => {
+                this.canvas.remove(path);
+            })
+
+            this.saveWork();
+        }
     },
     watch: {
         lineColor(val) {
@@ -478,23 +483,23 @@ export default {
     }
 
     &-2 {
+        height: 15px;
+        width: 15px;
+    }
+
+    &-3 {
         height: 20px;
         width: 20px;
     }
 
-    &-3 {
-        height: 30px;
-        width: 30px;
-    }
-
     &-4 {
-        height: 40px;
-        width: 40px;
+        height: 25px;
+        width: 25px;
     }
 
     &-5 {
-        height: 50px;
-        width: 50px;
+        height: 30px;
+        width: 30px;
     }
 }
 </style>

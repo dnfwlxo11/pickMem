@@ -6,8 +6,8 @@
                     <div class="row">
                         <div class="col-3"></div>
                         <div class="col-5 ml-5 mb-2 text-center">
-                            <button class="btn btn-outline-primary mr-3" @click="canvas.discardActiveObject().renderAll();isOpen=true">미 리 보 기</button>
-                            <button v-if="isWork" class="btn btn-outline-primary mr-2" @click="saveWork">저 장 하 기</button>
+                            <button class="btn-custom mr-3" @click="canvas.discardActiveObject().renderAll();isOpen=true">미 리 보 기</button>
+                            <!-- <button v-if="isWork" class="btn-custom mr-2" @click="saveWork">저 장 하 기</button> -->
                         </div>
                         <div class="col-3">
                             <div class="h-100 alert-icon d-flex justify-content-center align-items-center">
@@ -219,6 +219,8 @@ export default {
 
                 this.canvas.remove(targetObj);
                 this.canvas.renderAll();
+
+                this.saveWork();
             }
         },
         createObj(type, left, top) {

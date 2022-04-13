@@ -89,16 +89,6 @@ export default {
 </script>
 
 <style lang="scss">
-.btn {
-  border-radius: 0;
-  border: 1px solid black;
-  color: black;
-}
-
-.btn:hover {
-  background-color: black;
-  border: 1px solid black;
-}
 
 .body {
     margin-top: 100px;
