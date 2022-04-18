@@ -4,7 +4,7 @@
             <div class="title">
                 <div><strong>Pick The Moment</strong></div>    
             </div>
-            <div class="sub-title mb-5"><small>지금 이 순간을 영원히 기억할 수 있어요.</small></div>
+            <div class="sub-title mb-5"><small>무제한으로 원하는 모습을 찍고 꾸미세요!</small></div>
 
             <span>Click to Start</span>
         </div>

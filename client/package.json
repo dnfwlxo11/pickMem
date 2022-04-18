@@ -11,6 +11,7 @@
     "fabric": "^5.2.1",
     "html2canvas": "^1.4.1",
     "vue": "^2.6.11",
+    "vue-meta": "^2.4.0",
     "vue-router": "^3.2.0",
     "vue-toasted": "^1.1.28",
     "vuedraggable": "^2.24.3",
