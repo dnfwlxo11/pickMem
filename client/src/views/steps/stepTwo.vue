@@ -59,10 +59,9 @@
                                     </div>
                                     <div v-else class="takePic d-flex justify-content-center align-items-center" v-on="isPhotoTaken ? { click:() => { saveImage(); isPhotoTaken=false; }} : { click:() => { takePhoto(); }}">
                                         <div class="takePic-inner">
-                                            
-                                        </div>
-                                        <div v-if="isPhotoTaken">
-                                            <i class="mdi mdi-image-plus"></i>
+                                            <div v-if="isPhotoTaken" class="h-100 d-flex justify-content-center align-items-center">
+                                                <i class="mdi mdi-tray-plus" style="font-size: 20px;"></i>
+                                            </div>    
                                         </div>
                                     </div>
                                 </div>
@@ -85,7 +84,7 @@
                     <div class="h-100" style="box-shadow: 1px 1px 3px black;">
                         <div class="m-auto row h-50" v-for="(row, rowIdx) of [0, 1]" :key="rowIdx">
                             <div class="col-4 m-auto" v-for="(col, colIdx) of [0, 1, 2]" :key="colIdx">
-                                <div v-if="Object.values(images)[rowIdx*3 + col]" class="card m-auto" style="position: relative;">
+                                <div v-if="Object.values(images)[rowIdx*3 + col]" class="card m-auto mb-3" style="position: relative;">
                                     <img class="uploadImage" :src="`${Object.values(images)[rowIdx*3 + col]}`">
                                     <div class="overlay"><i class="mdi mdi-close" @click="removeImg(Object.keys(images)[rowIdx*3 + col])"></i></div>
                                 </div>

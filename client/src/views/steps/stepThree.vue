@@ -14,7 +14,7 @@
                     <div>이미지 리스트</div>
                     <hr>
                     <div class="images text-center">
-                        <div class="mb-3" v-for="(id, idx) of Object.keys(images)" :key="id">
+                        <div class="mb-3" v-for="(id, idx) of Object.keys(images)" :key="idx">
                             <i v-if="Object.values(getSelectList).includes(id)" class="mdi mdi-check-circle mr-2" style="font-size: 30px;"></i>
                             <img :class="`m-auto mr-3 ${Object.values(getSelectList).includes(id) ? 'selected' : ''} ${rows <= columns ? 'previewImg-horizontal' : 'previewImg-vertical'}`" :src="images[id]" alt="" :id="`${id}`" @click="selectToClick(getSelectTargetLen, id, images[id])" draggable="false">
                             <hr>
